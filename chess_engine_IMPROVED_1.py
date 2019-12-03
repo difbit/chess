@@ -43,7 +43,7 @@ posi = [
     0, 0, '-', '-', '-', '-', '-', '-', '-', '-', 0, 0,  #60-71     #62-69
     0, 0, '-', 'R', '-', '-', 'q', '-', 'R', '-', 0, 0,  #72-83     #74-81
     0, 0, '-', '-', '-', '-', '-', '-', '-', '-', 0, 0,  #84-95     #86-93
-    0, 0, '-', '-', 'K', '-', '-', 'N', 'B', '-', 0, 0,  #96-107    #98-105
+    0, 0, '-', '-', 'K', '-', '-', 'N', '-', 'B', 0, 0,  #96-107    #98-105
     0, 0, '-', '-', '-', '-', '-', '-', '-', '-', 0, 0,  #108-119   #110-117
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,                  #120-131
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0                   #132-143
@@ -186,12 +186,25 @@ class Whitem(Dictionaries):
             mod_posi = list(orig_posi)
             print "PIECE", piece
             if TARGET_PIECE != []:
-                for move in moves[piece]:
-                    mod_posi[TARGET_PIECE[0]], mod_posi[TARGET_PIECE[0] + move] = \
-                    mod_posi[TARGET_PIECE[0] + move], mod_posi[TARGET_PIECE[0]] 
-                    self.posis.append(mod_posi)
-                    print board_view(mod_posi)
-                    mod_posi = list(orig_posi)
+                if self.pieces[piece] in ['R','Q','B','r','q','b']:
+                    rang = 8
+                else:
+                    rang = 2
+                for go in range(1, rang):
+                    for move in moves[piece]:
+                        print mod_posi[TARGET_PIECE[0] + move * go]
+                        if mod_posi[TARGET_PIECE[0] + move * go] in (ZEROS + self.pieces.values()):
+                            continue
+                        if mod_posi[TARGET_PIECE[0] + move * go] != '-':
+                            original_square = '-' 
+                        else:
+                            original_square = mod_posi[TARGET_PIECE[0] + move * go]
+
+                        mod_posi[TARGET_PIECE[0]], mod_posi[TARGET_PIECE[0] + move * go] = \
+                        original_square, mod_posi[TARGET_PIECE[0]] 
+                        self.posis.append(mod_posi)
+                        print board_view(mod_posi)
+                        mod_posi = list(orig_posi)
 
         piece_avoid = upper_case(self.pieces).values() + lower_case(self.pieces).values()
 

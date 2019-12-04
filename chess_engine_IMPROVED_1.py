@@ -38,12 +38,12 @@ posi = [
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,                  #0-11
     0, 0, 0, 0, 0, 0 ,0, 0, 0, 0, 0, 0,                  #12-23
     0, 0, '-', '-', '-', '-', '-', '-', '-', '-', 0, 0,  #24-35     #26-33
-    0, 0, '-', '-', '-', 'q', '-', '-', '-', 'k', 0, 0,  #36-47     #38-45
-    0, 0, '-', '-', '-', '-', '-', 'N', '-', '-', 0, 0,  #48-59     #50-57
-    0, 0, '-', '-', '-', '-', '-', '-', '-', '-', 0, 0,  #60-71     #62-69
-    0, 0, '-', 'R', '-', '-', 'q', '-', 'R', '-', 0, 0,  #72-83     #74-81
+    0, 0, '-', 'n', '-', '-', '-', '-', '-', 'k', 0, 0,  #36-47     #38-45
+    0, 0, '-', '-', 'p', '-', '-', '-', '-', '-', 0, 0,  #48-59     #50-57
+    0, 0, '-', '-', '-', 'P', '-', '-', '-', '-', 0, 0,  #60-71     #62-69
+    0, 0, '-', '-', '-', '-', 'q', '-', '-', '-', 0, 0,  #72-83     #74-81
     0, 0, '-', '-', '-', '-', '-', '-', '-', '-', 0, 0,  #84-95     #86-93
-    0, 0, '-', '-', 'K', '-', '-', 'N', '-', 'B', 0, 0,  #96-107    #98-105
+    0, 0, 'P', '-', 'K', '-', '-', '-', '-', '-', 0, 0,  #96-107    #98-105
     0, 0, '-', '-', '-', '-', '-', '-', '-', '-', 0, 0,  #108-119   #110-117
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,                  #120-131
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0                   #132-143
@@ -74,7 +74,7 @@ moves = {
 "bishop" : [X+Y, X-Y, -X+Y, -X-Y],
 "queen" : [X, Y, -X, -Y, X+Y, X-Y, -X+Y, -X-Y],
 "king" : [X, Y, -X, -Y, X+Y, X-Y, -X+Y, -X-Y],
-"pawn" : [-Y, -Y+X, -Y-X]
+"pawn" : [-Y, -Y-Y, -Y+X, -Y-X]
 }
 
 #The function for rotating the board; used when a move is made
@@ -180,40 +180,47 @@ class Whitem(Dictionaries):
         OWN_PIECES = []
 
         for piece in self.pieces:
-            TARGET_PIECE = [i for i, x in enumerate(self.posis[0]) if x == self.pieces[piece]]
-            print TARGET_PIECE
+            OWN_PIECES = [i for i, x in enumerate(self.posis[0]) if x == self.pieces[piece]]
+            print OWN_PIECES
             orig_posi = list(self.posis[0])
             mod_posi = list(orig_posi)
             print "PIECE", piece
-            if TARGET_PIECE != []:
-                if self.pieces[piece] in ['R','Q','B','r','q','b']:
-                    rang = 8
-                else:
-                    rang = 2
-                for go in range(1, rang):
+            if OWN_PIECES != []:
+                for enum_piece in OWN_PIECES:
+                    if self.pieces[piece] in ['R','Q','B','r','q','b']:
+                        rang = 8
+                    else:
+                        rang = 2
                     for move in moves[piece]:
-                        print mod_posi[TARGET_PIECE[0] + move * go]
-                        if mod_posi[TARGET_PIECE[0] + move * go] in (ZEROS + self.pieces.values()):
+                        if (self.pieces[piece] in ['P','p']) and (moves[piece][1] == move) and (enum_piece not in range(98,105)):
                             continue
-                        if mod_posi[TARGET_PIECE[0] + move * go] != '-':
-                            original_square = '-' 
-                        else:
-                            original_square = mod_posi[TARGET_PIECE[0] + move * go]
+                        zeros = 0
+                        for go in range(1, rang):
+                            print mod_posi[enum_piece + move * go]
+                            if mod_posi[enum_piece + move * go] in (ZEROS + self.pieces.values()):
+                                if zeros == 1:
+                                    break
+                                zeros += 1
+                                continue
+                            elif mod_posi[enum_piece + move * go] != '-':
+                                zeros += 1
+                                original_square = '-'
+                            else:
+                                original_square = mod_posi[enum_piece + move * go]
+                                # Check if pawn's move is in the first two items in the list
+                                if self.pieces[piece] in ['P','p'] and (move not in moves[piece][:2]):
+                                    continue
+                            mod_posi[enum_piece], mod_posi[enum_piece + move * go] = \
+                            original_square, mod_posi[enum_piece]
+                            self.posis.append(mod_posi)
+                            print board_view(mod_posi)
+                            mod_posi = list(orig_posi)
+                            if zeros == 1:
+                                break
 
-                        mod_posi[TARGET_PIECE[0]], mod_posi[TARGET_PIECE[0] + move * go] = \
-                        original_square, mod_posi[TARGET_PIECE[0]] 
-                        self.posis.append(mod_posi)
-                        print board_view(mod_posi)
-                        mod_posi = list(orig_posi)
-
-        piece_avoid = upper_case(self.pieces).values() + lower_case(self.pieces).values()
-
-        print piece_avoid
-
-        #for board in self.posis:
-            #print board_view(board)
-
-        print "YES"
+#         piece_avoid = upper_case(self.pieces).values() + lower_case(self.pieces).values()
+#
+#         print piece_avoid
 
         return
 

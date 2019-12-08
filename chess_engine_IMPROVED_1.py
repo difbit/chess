@@ -40,7 +40,7 @@ posi = [
     0, 0, '-', '-', '-', '-', '-', '-', '-', '-', 0, 0,  #24-35     #26-33
     0, 0, '-', 'n', '-', '-', '-', '-', '-', 'k', 0, 0,  #36-47     #38-45
     0, 0, '-', '-', 'p', '-', '-', '-', '-', '-', 0, 0,  #48-59     #50-57
-    0, 0, '-', '-', '-', 'P', '-', '-', '-', '-', 0, 0,  #60-71     #62-69
+    0, 0, '-', 'R', '-', 'P', '-', '-', '-', '-', 0, 0,  #60-71     #62-69
     0, 0, '-', '-', '-', '-', 'q', '-', '-', '-', 0, 0,  #72-83     #74-81
     0, 0, '-', '-', '-', '-', '-', '-', '-', '-', 0, 0,  #84-95     #86-93
     0, 0, 'P', '-', 'K', '-', '-', '-', '-', '-', 0, 0,  #96-107    #98-105
@@ -168,8 +168,6 @@ class Whitem(Dictionaries):
         del enemy_w[:]
         del PIECE_POSITIONS[:]
 
-        #kings.pieces_attacking = []
-
         if self.white_to_move:
             self.pieces = upper_case(self.pieces)
         else:
@@ -192,18 +190,15 @@ class Whitem(Dictionaries):
                     else:
                         rang = 2
                     for move in moves[piece]:
-                        if (self.pieces[piece] in ['P','p']) and (moves[piece][1] == move) and (enum_piece not in range(98,105)):
+                        if (self.pieces[piece] in ['P','p']) and (moves[piece][1] == move) and (enum_piece not in range(98,106)):
                             continue
-                        zeros = 0
+                        ate_piece = False
                         for go in range(1, rang):
                             print mod_posi[enum_piece + move * go]
                             if mod_posi[enum_piece + move * go] in (ZEROS + self.pieces.values()):
-                                if zeros == 1:
-                                    break
-                                zeros += 1
-                                continue
+                                break
                             elif mod_posi[enum_piece + move * go] != '-':
-                                zeros += 1
+                                ate_piece = True
                                 original_square = '-'
                             else:
                                 original_square = mod_posi[enum_piece + move * go]
@@ -215,7 +210,7 @@ class Whitem(Dictionaries):
                             self.posis.append(mod_posi)
                             print board_view(mod_posi)
                             mod_posi = list(orig_posi)
-                            if zeros == 1:
+                            if ate_piece:
                                 break
 
 #         piece_avoid = upper_case(self.pieces).values() + lower_case(self.pieces).values()

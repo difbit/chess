@@ -173,16 +173,17 @@ class Whitem(Dictionaries):
         else:
             self.pieces = lower_case(self.pieces)
 
-        self.posis.append(self.start)
+#         self.posis.append(self.start)
 
         OWN_PIECES = []
 
         for piece in self.pieces:
-            OWN_PIECES = [i for i, x in enumerate(self.posis[0]) if x == self.pieces[piece]]
-            print OWN_PIECES
-            orig_posi = list(self.posis[0])
+            orig_posi = list(self.start)
+            OWN_PIECES = [i for i, x in enumerate(orig_posi) if x == self.pieces[piece]]
+#             print OWN_PIECES
+#             orig_posi = list(self.posis[0])
             mod_posi = list(orig_posi)
-            print "PIECE", piece
+#             print "PIECE", piece
             if OWN_PIECES != []:
                 for enum_piece in OWN_PIECES:
                     if self.pieces[piece] in ['R','Q','B','r','q','b']:
@@ -194,7 +195,7 @@ class Whitem(Dictionaries):
                             continue
                         ate_piece = False
                         for go in range(1, rang):
-                            print mod_posi[enum_piece + move * go]
+#                             print mod_posi[enum_piece + move * go]
                             if mod_posi[enum_piece + move * go] in (ZEROS + self.pieces.values()):
                                 break
                             elif mod_posi[enum_piece + move * go] != '-':
@@ -208,7 +209,7 @@ class Whitem(Dictionaries):
                             mod_posi[enum_piece], mod_posi[enum_piece + move * go] = \
                             original_square, mod_posi[enum_piece]
                             self.posis.append(mod_posi)
-                            print board_view(mod_posi)
+#                             print board_view(mod_posi)
                             mod_posi = list(orig_posi)
                             if ate_piece:
                                 break
@@ -864,10 +865,85 @@ def turn_test():
         rotate(posi)
         print board_view(posi)
 
+
+
+def get_piece_moves(posi, white_to_move, _pieces):
+
+    if white_to_move:
+        _pieces = upper_case(_pieces)
+    else:
+        _pieces = lower_case(_pieces)
+
+#         self.posis.append(self.start)
+
+    positions = []
+
+    OWN_PIECES = []
+
+    for piece in _pieces:
+        orig_posi = list(posi)
+        OWN_PIECES = [i for i, x in enumerate(orig_posi) if x == _pieces[piece]]
+        mod_posi = list(orig_posi)
+        if OWN_PIECES != []:
+            for enum_piece in OWN_PIECES:
+                if _pieces[piece] in ['R','Q','B','r','q','b']:
+                    rang = 8
+                else:
+                    rang = 2
+                for move in moves[piece]:
+                    if (_pieces[piece] in ['P','p']) and (moves[piece][1] == move) and (enum_piece not in range(98,106)):
+                        continue
+                    ate_piece = False
+                    for go in range(1, rang):
+#                             print mod_posi[enum_piece + move * go]
+                        if mod_posi[enum_piece + move * go] in (ZEROS + _pieces.values()):
+                            break
+                        elif mod_posi[enum_piece + move * go] != '-':
+                            ate_piece = True
+                            original_square = '-'
+                        else:
+                            original_square = mod_posi[enum_piece + move * go]
+                            # Check if pawn's move is in the first two items in the list
+                            if _pieces[piece] in ['P','p'] and (move not in moves[piece][:2]):
+                                continue
+                        mod_posi[enum_piece], mod_posi[enum_piece + move * go] = \
+                        original_square, mod_posi[enum_piece]
+                        positions.append(mod_posi)
+                        mod_posi = list(orig_posi)
+                        if ate_piece:
+                            break
+
+    return positions, posi
+
+
+
 #moving_randomly()
 game = Dictionaries()
-a_game = Whitem(False, False, True, newlist, newlist_B, _pieces, [], posi)
-a_game.move_gen(posi)
+a_game = Whitem(False, False, True, newlist, newlist_B, _pieces, [], posiii)
+# a_game.move_gen(a_game.start)
+white_to_move = True
+fetched_moves = get_piece_moves(a_game.start,white_to_move, _pieces)
+print board_view(a_game.start)
+random_posi = random.choice(fetched_moves[0])
+print board_view(random_posi)
+
+white_to_move = False
+rotate(random_posi)
+
+fetched_moves = get_piece_moves(random_posi, white_to_move, _pieces)
+random_posi = random.choice(fetched_moves[0])
+rotate(random_posi)
+print board_view(random_posi)
+
+
+
+# a_game.white_to_move = False
+# print a_game.white_to_move
+# print a_game.pieces
+# random_posi = random.choice(a_game.posis)
+# a_game.move_gen(random_posi)
+# random_posi = random.choice(a_game.posis)
+# print board_view(random_posi)
 
 
 toc = time.clock()

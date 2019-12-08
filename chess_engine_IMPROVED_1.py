@@ -42,8 +42,8 @@ posi = [
     0, 0, '-', '-', 'p', '-', '-', '-', '-', '-', 0, 0,  #48-59     #50-57
     0, 0, '-', 'R', '-', 'P', '-', '-', '-', '-', 0, 0,  #60-71     #62-69
     0, 0, '-', '-', '-', '-', 'q', '-', '-', '-', 0, 0,  #72-83     #74-81
-    0, 0, '-', '-', '-', '-', '-', '-', '-', '-', 0, 0,  #84-95     #86-93
-    0, 0, 'P', '-', 'K', '-', '-', '-', '-', '-', 0, 0,  #96-107    #98-105
+    0, 0, '-', '-', '-', 'K', '-', '-', '-', '-', 0, 0,  #84-95     #86-93
+    0, 0, 'P', '-', '-', '-', '-', '-', '-', '-', 0, 0,  #96-107    #98-105
     0, 0, '-', '-', '-', '-', '-', '-', '-', '-', 0, 0,  #108-119   #110-117
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,                  #120-131
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0                   #132-143
@@ -915,25 +915,81 @@ def get_piece_moves(posi, white_to_move, _pieces):
 
     return positions, posi
 
+def bool_negation(bool):
+    return not bool
+
+
+def search_checks(orig_fetched_moves, white_to_move):
+    for posit in orig_fetched_moves[0]:
+#         print "orig len", len(orig_fetched_moves[0])
+#         random_posi = random.choice(orig_fetched_moves[0])
+        # white to move is set to false
+        white_to_move = bool_negation(white_to_move)
+        rotate(posit)
+        fetched_moves = get_piece_moves(posit, white_to_move, _pieces)
+
+        # Search boards if one king is missing
+        for board in fetched_moves[0]:
+            kings = [i for i, x in enumerate(board) if x in ['K', 'k']]
+    #         print "kings", kings
+            if len(kings) < 2:
+                orig_fetched_moves[0].remove(posit)
+                white_to_move = bool_negation(white_to_move)
+                rotate(posit)
+                return search_checks(orig_fetched_moves, white_to_move)
+    return orig_fetched_moves, white_to_move
 
 
 #moving_randomly()
-game = Dictionaries()
-a_game = Whitem(False, False, True, newlist, newlist_B, _pieces, [], posiii)
-# a_game.move_gen(a_game.start)
-white_to_move = True
-fetched_moves = get_piece_moves(a_game.start,white_to_move, _pieces)
+a_game = Whitem(False, False, True, newlist, newlist_B, _pieces, [], posi)
 print board_view(a_game.start)
-random_posi = random.choice(fetched_moves[0])
+white_to_move = True
+fetched_moves = get_piece_moves(a_game.start, white_to_move, _pieces)
+orig_fetched_moves = list(fetched_moves)
+# print board_view(random_posi)
+
+searched_moves = search_checks(orig_fetched_moves, white_to_move)
+random_posi = random.choice(searched_moves[0][0])
+print "fetched len", len(fetched_moves[0])
 print board_view(random_posi)
 
-white_to_move = False
-rotate(random_posi)
+# random_posi = random.choice(orig_fetched_moves[0])
+# white_to_move = bool_negation(white_to_move)
+# rotate(random_posi)
+# fetched_moves = get_piece_moves(random_posi, white_to_move, _pieces)
+#
+# # Search boards if one king is missing
+# for board in fetched_moves[0]:
+#     kings = [i for i, x in enumerate(board) if x in ['K', 'k']]
+#     print "kings", kings
+#     if len(kings) < 2:
+#         orig_fetched_moves[0].remove(random_posi)
+#         white_to_move = bool_negation(white_to_move)
+#         rotate(random_posi)
+#         print "yea"
+#         break
 
-fetched_moves = get_piece_moves(random_posi, white_to_move, _pieces)
-random_posi = random.choice(fetched_moves[0])
-rotate(random_posi)
-print board_view(random_posi)
+
+# while len(kings) < 3:
+#     if len(fetched_moves[0]) == 1:
+#         break
+#     fetched_moves[0].remove(random_posi)
+#     random_posi = random.choice(fetched_moves[0])
+#     print "yea"
+#     kings = [i for i, x in enumerate(random_posi) if x in ['K', 'k']]
+
+
+# print "fetched", fetched_moves[0]
+
+
+# print "original position", board_view(fetched_moves[1])
+
+# white_to_move = False
+# rotate(random_posi)
+#
+# fetched_moves = get_piece_moves(random_posi, white_to_move, _pieces)
+# random_posi = random.choice(fetched_moves[0])
+# rotate(random_posi)
 
 
 

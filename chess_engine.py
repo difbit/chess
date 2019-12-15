@@ -40,11 +40,11 @@ posiii = [
 posi = [
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,                  #0-11
     0, 0, 0, 0, 0, 0 ,0, 0, 0, 0, 0, 0,                  #12-23
-    0, 0, '-', '-', '-', '-', '-', '-', '-', '-', 0, 0,  #24-35     #26-33
-    0, 0, '-', '-', '-', '-', '-', '-', '-', 'k', 0, 0,  #36-47     #38-45
+    0, 0, '-', '-', '-', '-', 'q', '-', '-', '-', 0, 0,  #24-35     #26-33
+    0, 0, '-', '-', '-', 'q', '-', '-', '-', 'k', 0, 0,  #36-47     #38-45
     0, 0, '-', '-', '-', '-', '-', '-', '-', '-', 0, 0,  #48-59     #50-57
     0, 0, '-', '-', '-', '-', '-', '-', '-', '-', 0, 0,  #60-71     #62-69
-    0, 0, '-', '-', '-', 'q', '-', '-', '-', '-', 0, 0,  #72-83     #74-81
+    0, 0, '-', '-', '-', '-', '-', '-', '-', '-', 0, 0,  #72-83     #74-81
     0, 0, '-', '-', 'K', '-', '-', '-', '-', '-', 0, 0,  #84-95     #86-93
     0, 0, '-', '-', '-', '-', '-', '-', '-', '-', 0, 0,  #96-107    #98-105
     0, 0, '-', '-', '-', '-', '-', '-', '-', '-', 0, 0,  #108-119   #110-117
@@ -824,7 +824,6 @@ def get_piece_moves(posi, white_to_move, _pieces):
                         mod_posi = list(orig_posi)
                         if ate_piece:
                             break
-
     return positions, posi
 
 def bool_negation(bool):
@@ -848,12 +847,12 @@ def search_checks(orig_fetched_moves, white_to_move):
 #             print "kings", kings
             if len(kings) < 2:
                 remove_these.append(posit)
-                continue
+                break
 #                 orig_fetched_moves[0].remove(posit)
         rotate(posit)
     for rem in remove_these:
         orig_fetched_moves[0].remove(rem)
-    white_to_move = bool_negation(white_to_move)
+#     white_to_move = bool_negation(white_to_move)
 #                 return search_checks(orig_fetched_moves, white_to_move)
     return orig_fetched_moves, white_to_move
 
@@ -861,20 +860,48 @@ def search_checks(orig_fetched_moves, white_to_move):
 #moving_randomly()
 # a_game = Whitem(False, False, True, newlist, newlist_B, _pieces, [], posi)
 
+# for rand in searched_moves[0][0]:
+#     print board_view(rand)
+
+def bit_board_move(random_posi, white_to_move, _pieces):
+    fetched_moves = get_piece_moves(random_posi, white_to_move, _pieces)
+    orig_fetched_moves = list(fetched_moves)
+    searched_moves = search_checks(orig_fetched_moves, white_to_move)
+    random_posi = random.choice(searched_moves[0][0])
+    print "fetched len", len(fetched_moves[0])
+    print board_view(random_posi)
+#     white_to_move = searched_moves[1]
+    white_to_move = bool_negation(white_to_move)
+    print "WHITE TO MOVE", white_to_move
+    if searched_moves[0][0] == []:
+        print "It is checkmate"
+        exit()
 
 print board_view(posi)
 white_to_move = True
 fetched_moves = get_piece_moves(posi, white_to_move, _pieces)
 orig_fetched_moves = list(fetched_moves)
-# print board_view(random_posi)
-
 searched_moves = search_checks(orig_fetched_moves, white_to_move)
-# for rand in searched_moves[0][0]:
-#     print board_view(rand)
 random_posi = random.choice(searched_moves[0][0])
 print "fetched len", len(fetched_moves[0])
 print board_view(random_posi)
+white_to_move = searched_moves[1]
+print "WHITE TO MOVE", white_to_move
 
+while True:
+#     bit_board_move(random_posi, white_to_move, _pieces)
+    fetched_moves = get_piece_moves(random_posi, white_to_move, _pieces)
+    orig_fetched_moves = list(fetched_moves)
+    searched_moves = search_checks(orig_fetched_moves, white_to_move)
+    if searched_moves[0][0] == []:
+        print "It is checkmate or stalemate"
+        exit()
+    random_posi = random.choice(searched_moves[0][0])
+    print "fetched len", len(fetched_moves[0])
+    print board_view(random_posi)
+    white_to_move = searched_moves[1]
+#     white_to_move = bool_negation(white_to_move)
+    print "WHITE TO MOVE", white_to_move
 ###############
 
 toc = time.clock()

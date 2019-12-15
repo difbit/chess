@@ -1,3 +1,6 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 import random
 import pprint
 import time
@@ -5,8 +8,6 @@ import sys
 from itertools import chain
 import itertools
 import pickle
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 tic = time.clock()
 
@@ -38,12 +39,12 @@ posi = [
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,                  #0-11
     0, 0, 0, 0, 0, 0 ,0, 0, 0, 0, 0, 0,                  #12-23
     0, 0, '-', '-', '-', '-', '-', '-', '-', '-', 0, 0,  #24-35     #26-33
-    0, 0, '-', 'n', '-', '-', '-', '-', '-', 'k', 0, 0,  #36-47     #38-45
-    0, 0, '-', '-', 'p', '-', '-', '-', '-', '-', 0, 0,  #48-59     #50-57
-    0, 0, '-', 'R', '-', 'P', '-', '-', '-', '-', 0, 0,  #60-71     #62-69
-    0, 0, '-', '-', '-', '-', 'q', '-', '-', '-', 0, 0,  #72-83     #74-81
-    0, 0, '-', '-', '-', 'K', '-', '-', '-', '-', 0, 0,  #84-95     #86-93
-    0, 0, 'P', '-', '-', '-', '-', '-', '-', '-', 0, 0,  #96-107    #98-105
+    0, 0, '-', '-', '-', '-', '-', '-', '-', 'k', 0, 0,  #36-47     #38-45
+    0, 0, '-', '-', '-', '-', '-', '-', '-', '-', 0, 0,  #48-59     #50-57
+    0, 0, '-', '-', '-', '-', '-', '-', '-', '-', 0, 0,  #60-71     #62-69
+    0, 0, '-', '-', '-', 'q', '-', '-', '-', '-', 0, 0,  #72-83     #74-81
+    0, 0, '-', '-', 'K', '-', '-', '-', '-', '-', 0, 0,  #84-95     #86-93
+    0, 0, '-', '-', '-', '-', '-', '-', '-', '-', 0, 0,  #96-107    #98-105
     0, 0, '-', '-', '-', '-', '-', '-', '-', '-', 0, 0,  #108-119   #110-117
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,                  #120-131
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0                   #132-143
@@ -920,23 +921,29 @@ def bool_negation(bool):
 
 
 def search_checks(orig_fetched_moves, white_to_move):
+    white_to_move = bool_negation(white_to_move)
+    remove_these = []
     for posit in orig_fetched_moves[0]:
-#         print "orig len", len(orig_fetched_moves[0])
-#         random_posi = random.choice(orig_fetched_moves[0])
         # white to move is set to false
-        white_to_move = bool_negation(white_to_move)
         rotate(posit)
         fetched_moves = get_piece_moves(posit, white_to_move, _pieces)
 
         # Search boards if one king is missing
         for board in fetched_moves[0]:
+#             rotate(board)
+#             print board_view(board)
+#             rotate(board)
             kings = [i for i, x in enumerate(board) if x in ['K', 'k']]
-    #         print "kings", kings
+#             print "kings", kings
             if len(kings) < 2:
-                orig_fetched_moves[0].remove(posit)
-                white_to_move = bool_negation(white_to_move)
-                rotate(posit)
-                return search_checks(orig_fetched_moves, white_to_move)
+                remove_these.append(posit)
+                continue
+#                 orig_fetched_moves[0].remove(posit)
+        rotate(posit)
+    for rem in remove_these:
+        orig_fetched_moves[0].remove(rem)
+    white_to_move = bool_negation(white_to_move)
+#                 return search_checks(orig_fetched_moves, white_to_move)
     return orig_fetched_moves, white_to_move
 
 
@@ -949,9 +956,14 @@ orig_fetched_moves = list(fetched_moves)
 # print board_view(random_posi)
 
 searched_moves = search_checks(orig_fetched_moves, white_to_move)
+# for rand in searched_moves[0][0]:
+#     print board_view(rand)
 random_posi = random.choice(searched_moves[0][0])
 print "fetched len", len(fetched_moves[0])
 print board_view(random_posi)
+
+
+###############
 
 # random_posi = random.choice(orig_fetched_moves[0])
 # white_to_move = bool_negation(white_to_move)

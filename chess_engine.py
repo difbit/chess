@@ -864,7 +864,7 @@ def search_checks(orig_fetched_moves, white_to_move):
 
 print board_view(posi)
 white_to_move = True
-fetched_moves = get_piece_moves(posi)
+fetched_moves = get_piece_moves(posi, white_to_move, _pieces)
 orig_fetched_moves = list(fetched_moves)
 # print board_view(random_posi)
 

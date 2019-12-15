@@ -1,3 +1,6 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 import random
 import pprint
 import time
@@ -5,8 +8,6 @@ import sys
 from itertools import chain
 import itertools
 import pickle
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 tic = time.clock()
 
@@ -38,12 +39,12 @@ posi = [
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,                  #0-11
     0, 0, 0, 0, 0, 0 ,0, 0, 0, 0, 0, 0,                  #12-23
     0, 0, '-', '-', '-', '-', '-', '-', '-', '-', 0, 0,  #24-35     #26-33
-    0, 0, '-', '-', '-', 'q', '-', '-', '-', 'k', 0, 0,  #36-47     #38-45
-    0, 0, '-', '-', '-', '-', '-', 'N', '-', '-', 0, 0,  #48-59     #50-57
+    0, 0, '-', '-', '-', '-', '-', '-', '-', 'k', 0, 0,  #36-47     #38-45
+    0, 0, '-', '-', '-', '-', '-', '-', '-', '-', 0, 0,  #48-59     #50-57
     0, 0, '-', '-', '-', '-', '-', '-', '-', '-', 0, 0,  #60-71     #62-69
-    0, 0, '-', 'R', '-', '-', 'q', '-', 'R', '-', 0, 0,  #72-83     #74-81
-    0, 0, '-', '-', '-', '-', '-', '-', '-', '-', 0, 0,  #84-95     #86-93
-    0, 0, '-', '-', 'K', '-', '-', 'N', 'B', '-', 0, 0,  #96-107    #98-105
+    0, 0, '-', '-', '-', 'q', '-', '-', '-', '-', 0, 0,  #72-83     #74-81
+    0, 0, '-', '-', 'K', '-', '-', '-', '-', '-', 0, 0,  #84-95     #86-93
+    0, 0, '-', '-', '-', '-', '-', '-', '-', '-', 0, 0,  #96-107    #98-105
     0, 0, '-', '-', '-', '-', '-', '-', '-', '-', 0, 0,  #108-119   #110-117
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,                  #120-131
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0                   #132-143
@@ -74,7 +75,7 @@ moves = {
 "bishop" : [X+Y, X-Y, -X+Y, -X-Y],
 "queen" : [X, Y, -X, -Y, X+Y, X-Y, -X+Y, -X-Y],
 "king" : [X, Y, -X, -Y, X+Y, X-Y, -X+Y, -X-Y],
-"pawn" : [-Y, -Y+X, -Y-X]
+"pawn" : [-Y, -Y-Y, -Y+X, -Y-X]
 }
 
 #The function for rotating the board; used when a move is made
@@ -96,6 +97,11 @@ def rotate(BOARD):
 
 
 white_pieces = {
+    "king": 'K', "rook": 'R', "pawn": 'P',
+    "knight": 'N', "queen": 'Q', "bishop": 'B'
+    }
+
+_pieces = {
     "king": 'K', "rook": 'R', "pawn": 'P',
     "knight": 'N', "queen": 'Q', "bishop": 'B'
     }
@@ -143,12 +149,15 @@ CHECKING_SQUARE_LIST = []
 
 class Whitem(Dictionaries):
 
-    def __init__(self, kingmove, rookmove, white_to_move, newlist, newlist_B):
+    def __init__(self, kingmove, rookmove, white_to_move, newlist, newlist_B, pieces, posis, start):
         self.kingmove = kingmove
         self.rookmove = rookmove
         self.white_to_move = white_to_move
         self.newlist = newlist
         self.newlist_B = newlist
+        self.pieces = pieces
+        self.posis = posis
+        self.start = start
 
     def move_gen(self, posi):
         # Links necessary lists to enumerate moves and positions.
@@ -160,7 +169,61 @@ class Whitem(Dictionaries):
         del enemy_w[:]
         del PIECE_POSITIONS[:]
 
-        #kings.pieces_attacking = []
+        if self.white_to_move:
+            self.pieces = upper_case(self.pieces)
+        else:
+            self.pieces = lower_case(self.pieces)
+
+#         self.posis.append(self.start)
+
+        OWN_PIECES = []
+
+        for piece in self.pieces:
+            orig_posi = list(self.start)
+            OWN_PIECES = [i for i, x in enumerate(orig_posi) if x == self.pieces[piece]]
+#             print OWN_PIECES
+#             orig_posi = list(self.posis[0])
+            mod_posi = list(orig_posi)
+#             print "PIECE", piece
+            if OWN_PIECES != []:
+                for enum_piece in OWN_PIECES:
+                    if self.pieces[piece] in ['R','Q','B','r','q','b']:
+                        rang = 8
+                    else:
+                        rang = 2
+                    for move in moves[piece]:
+                        if (self.pieces[piece] in ['P','p']) and (moves[piece][1] == move) and (enum_piece not in range(98,106)):
+                            continue
+                        ate_piece = False
+                        for go in range(1, rang):
+#                             print mod_posi[enum_piece + move * go]
+                            if mod_posi[enum_piece + move * go] in (ZEROS + self.pieces.values()):
+                                break
+                            elif mod_posi[enum_piece + move * go] != '-':
+                                ate_piece = True
+                                original_square = '-'
+                            else:
+                                original_square = mod_posi[enum_piece + move * go]
+                                # Check if pawn's move is in the first two items in the list
+                                if self.pieces[piece] in ['P','p'] and (move not in moves[piece][:2]):
+                                    continue
+                            mod_posi[enum_piece], mod_posi[enum_piece + move * go] = \
+                            original_square, mod_posi[enum_piece]
+                            self.posis.append(mod_posi)
+#                             print board_view(mod_posi)
+                            mod_posi = list(orig_posi)
+                            if ate_piece:
+                                break
+
+#         piece_avoid = upper_case(self.pieces).values() + lower_case(self.pieces).values()
+#
+#         print piece_avoid
+
+        return
+
+
+
+        ###
 
         #kings.seek_threats(posi)
         kings.check = False
@@ -742,9 +805,6 @@ def capture_piece():
 
 
         #print board_view(test)
-game = Dictionaries()
-a_game = Whitem(False, False, True, newlist, newlist_B)
-#a_game.posi = this_board
 
 #b_game = Blackm()
 kings = Threat(False, None, None)
@@ -806,7 +866,152 @@ def turn_test():
         rotate(posi)
         print board_view(posi)
 
-moving_randomly()
+
+
+def get_piece_moves(posi, white_to_move, _pieces):
+
+    if white_to_move:
+        _pieces = upper_case(_pieces)
+    else:
+        _pieces = lower_case(_pieces)
+
+#         self.posis.append(self.start)
+
+    positions = []
+
+    OWN_PIECES = []
+
+    for piece in _pieces:
+        orig_posi = list(posi)
+        OWN_PIECES = [i for i, x in enumerate(orig_posi) if x == _pieces[piece]]
+        mod_posi = list(orig_posi)
+        if OWN_PIECES != []:
+            for enum_piece in OWN_PIECES:
+                if _pieces[piece] in ['R','Q','B','r','q','b']:
+                    rang = 8
+                else:
+                    rang = 2
+                for move in moves[piece]:
+                    if (_pieces[piece] in ['P','p']) and (moves[piece][1] == move) and (enum_piece not in range(98,106)):
+                        continue
+                    ate_piece = False
+                    for go in range(1, rang):
+#                             print mod_posi[enum_piece + move * go]
+                        if mod_posi[enum_piece + move * go] in (ZEROS + _pieces.values()):
+                            break
+                        elif mod_posi[enum_piece + move * go] != '-':
+                            ate_piece = True
+                            original_square = '-'
+                        else:
+                            original_square = mod_posi[enum_piece + move * go]
+                            # Check if pawn's move is in the first two items in the list
+                            if _pieces[piece] in ['P','p'] and (move not in moves[piece][:2]):
+                                continue
+                        mod_posi[enum_piece], mod_posi[enum_piece + move * go] = \
+                        original_square, mod_posi[enum_piece]
+                        positions.append(mod_posi)
+                        mod_posi = list(orig_posi)
+                        if ate_piece:
+                            break
+
+    return positions, posi
+
+def bool_negation(bool):
+    return not bool
+
+
+def search_checks(orig_fetched_moves, white_to_move):
+    white_to_move = bool_negation(white_to_move)
+    remove_these = []
+    for posit in orig_fetched_moves[0]:
+        # white to move is set to false
+        rotate(posit)
+        fetched_moves = get_piece_moves(posit, white_to_move, _pieces)
+
+        # Search boards if one king is missing
+        for board in fetched_moves[0]:
+#             rotate(board)
+#             print board_view(board)
+#             rotate(board)
+            kings = [i for i, x in enumerate(board) if x in ['K', 'k']]
+#             print "kings", kings
+            if len(kings) < 2:
+                remove_these.append(posit)
+                continue
+#                 orig_fetched_moves[0].remove(posit)
+        rotate(posit)
+    for rem in remove_these:
+        orig_fetched_moves[0].remove(rem)
+    white_to_move = bool_negation(white_to_move)
+#                 return search_checks(orig_fetched_moves, white_to_move)
+    return orig_fetched_moves, white_to_move
+
+
+#moving_randomly()
+a_game = Whitem(False, False, True, newlist, newlist_B, _pieces, [], posi)
+print board_view(a_game.start)
+white_to_move = True
+fetched_moves = get_piece_moves(a_game.start, white_to_move, _pieces)
+orig_fetched_moves = list(fetched_moves)
+# print board_view(random_posi)
+
+searched_moves = search_checks(orig_fetched_moves, white_to_move)
+# for rand in searched_moves[0][0]:
+#     print board_view(rand)
+random_posi = random.choice(searched_moves[0][0])
+print "fetched len", len(fetched_moves[0])
+print board_view(random_posi)
+
+
+###############
+
+# random_posi = random.choice(orig_fetched_moves[0])
+# white_to_move = bool_negation(white_to_move)
+# rotate(random_posi)
+# fetched_moves = get_piece_moves(random_posi, white_to_move, _pieces)
+#
+# # Search boards if one king is missing
+# for board in fetched_moves[0]:
+#     kings = [i for i, x in enumerate(board) if x in ['K', 'k']]
+#     print "kings", kings
+#     if len(kings) < 2:
+#         orig_fetched_moves[0].remove(random_posi)
+#         white_to_move = bool_negation(white_to_move)
+#         rotate(random_posi)
+#         print "yea"
+#         break
+
+
+# while len(kings) < 3:
+#     if len(fetched_moves[0]) == 1:
+#         break
+#     fetched_moves[0].remove(random_posi)
+#     random_posi = random.choice(fetched_moves[0])
+#     print "yea"
+#     kings = [i for i, x in enumerate(random_posi) if x in ['K', 'k']]
+
+
+# print "fetched", fetched_moves[0]
+
+
+# print "original position", board_view(fetched_moves[1])
+
+# white_to_move = False
+# rotate(random_posi)
+#
+# fetched_moves = get_piece_moves(random_posi, white_to_move, _pieces)
+# random_posi = random.choice(fetched_moves[0])
+# rotate(random_posi)
+
+
+
+# a_game.white_to_move = False
+# print a_game.white_to_move
+# print a_game.pieces
+# random_posi = random.choice(a_game.posis)
+# a_game.move_gen(random_posi)
+# random_posi = random.choice(a_game.posis)
+# print board_view(random_posi)
 
 
 toc = time.clock()

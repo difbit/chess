@@ -17,6 +17,8 @@ CHECKLIST_TWO = [25, 26, 27, 28, 29, 30, 31, 32, 33, 34,
                 113, 114, 115, 116, 117, 118, 95, 83, 71, 59,
                 47]
 
+"""Use these two boards to play around"""
+
 #The board representation
 posiii = [
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,                  #0-11
@@ -145,8 +147,6 @@ class Dictionaries(object):
 
 CHECKING_SQUARE_LIST = []
 
-
-
 class Whitem(Dictionaries):
 
     def __init__(self, kingmove, rookmove, white_to_move, newlist, newlist_B, pieces, posis, start):
@@ -221,13 +221,10 @@ class Whitem(Dictionaries):
 
         return
 
-
-
         ###
 
         #kings.seek_threats(posi)
         kings.check = False
-
 
         SIZE = 0
 
@@ -248,43 +245,15 @@ class Whitem(Dictionaries):
             self.newlist = upper_keys(self.newlist)
             white_pieces = upper_case(white_pieces)
 
-        print "PIECE IS HERE", kings.CURRENT_PIECE
-
         kings.seek_threats(posi, kings.CURRENT_PIECE)
 
-
-
-
-        print "WOO"
-        #kings.pieces_attacking = []
-
         print kings.piece
-
-        #print "KINGSSS", kings.kingSafety()
 
         LOOK_ALL = 1
 
         while len(kings.kingSafety()[0]) + LOOK_ALL >= 2:
             kings.kingSafety()
             LOOK_ALL -= 1
-
-        #this_piece_to_capture =
-
-        #capture_that_piece = kings.kingSafety()[0]
-        #print capture_that_piece
-
-        #if capture_that_piece != []:
-        #    pick_a_piece = random.choice(capture_that_piece)
-        #    print pick_a_piece
-        #    posi[pick_a_piece], posi[attack_this] = \
-        #    posi[attack_this], posi[pick_a_piece]
-        #    posi[attack_this] = '-'
-        #    return posi
-            #Whitem.move_gen(self, posi)
-
-        print "CHECK TRUE?", kings.check
-
-        print "WHO ATTACKS?", kings.pieces_attacking
 
         kings.pieces_attacking = []
 
@@ -312,7 +281,6 @@ class Whitem(Dictionaries):
             print kings.pieces_attacking
             print attack_this
             kings.seek_threats(posi, attack_this)
-            print "ATT", kings.pieces_attacking
 
             kings.check = True
             if kings.pieces_attacking != []:
@@ -323,9 +291,7 @@ class Whitem(Dictionaries):
                     posi[attack_that], posi[attack_this]
                     posi[attack_that] = "-"
                     kings.pieces_attacking = []
-                    print "JOU"
                     if kings.seek_threats(posi, kings.CURRENT_PIECE) != []:
-                        print "HERE"
                         attack_that = previous_piece
                         posi[attack_that], posi[attack_this] = \
                         posi[attack_this], posi[attack_that]
@@ -333,29 +299,22 @@ class Whitem(Dictionaries):
                     else:
                         return posi
             if self.white_to_move == True:
-                print "TRUE"
                 PIECE = 'K'
                 RANDOM_SQUARE = [i for i, y in enumerate(posi) if y == 'K']
                 SIZE += 1
                 RANDOM_SQUARE = RANDOM_SQUARE[0]
             elif self.white_to_move == False:
-                print "TRUE???"
                 PIECE = 'k'
                 RANDOM_SQUARE = [i for i, y in enumerate(posi) if y == 'k']
                 SIZE += 1
                 RANDOM_SQUARE = RANDOM_SQUARE[0]
-                print "what is random now huhuhuh?", RANDOM_SQUARE
 
             #else:
             #    RANDOM_SQUARE = kings.CURRENT_PIECE
             #    PIECE = posi[RANDOM_SQUARE]
 
-
-
-        print "what is random now?", RANDOM_SQUARE
         #kings.check = False
 
-        print "PIECE woot", PIECE
         #print "posiiii", RANDOM_SQUARE
         PIECE_STRING = white_pieces.keys()[white_pieces.values().index(PIECE)]
 
@@ -376,16 +335,11 @@ class Whitem(Dictionaries):
 
         #newlist is a list of possible moves of randomly selected piece
         RND_MOVE = random.choice(self.newlist[PIECE])
-        print "RND", RND_MOVE
         # RND_MOVE is a random move of PIECE
 
         # Pawns' initial squares
         INITIAL_PAWN_SQUARE = any(x in [RANDOM_SQUARE] \
         for x in list(range(98, 105)))
-
-        print "WHAT RAND", RANDOM_SQUARE
-
-        print "IS THIS KING", PIECE
 
         # posi[RND_MOVE] == '-' is a condition for square to be empty
         if PIECE in ['B', 'R', 'Q', 'b', 'r', 'q'] \
@@ -501,7 +455,6 @@ class Whitem(Dictionaries):
             - (RANDOM_SQUARE-RND_MOVE)*2] not in ['K', 'k']):
                 noppa = random.choice(range(0, 2))
                 if enemy != []:
-                    print "eat enemy!!!!!"
 
                     print "SEEK", kings.seek_threats(posi, RANDOM_SQUARE)
 
@@ -688,17 +641,6 @@ def chess_engine(): #This will be used for the evaluation function
         BOARD_LIST.append(board_object(posi))
         EVALUATIONS.append(Evaluate(posi).evaluation_function())
         depth += 1
-    #eval_2 = Evaluate(posi, False, 0, 0)
-    #eval_2.evaluation_function()
-    #print board_view(posi)
-    #BOARD_LIST.append(board_object(posi))
-    #print board_view(this_board.posi)
-    #rotate(this_board.posi)
-    #a_game.white_to_move = False
-    #a_game.move_gen(this_board.posi)
-    #rotate(this_board.posi)
-    #second_board = board_object(this_board.posi)
-    #print board_view(this_board.posi)
 
     #for i in range(0, LIMIT):
 
@@ -711,15 +653,6 @@ def chess_engine(): #This will be used for the evaluation function
 
     #Boards could be keys and evaluations values in dictionary
 
-    # This works!!
-    #if this_board.posi == BOARD_LIST[1].posi:
-    #    print "hurraa!"
-
-
-    #print eval_1.sum
-    #print eval_1.sum_1
-    #print eval_2.sum
-    #print eval_2.sum_1
 
 #check_these_pieces = []
 
@@ -798,7 +731,6 @@ class Threat(object):
             self.check = False
             return (self.pieces_attacking, self.CURRENT_PIECE)
 
-
 def capture_piece():
     if kings.check:
         PIECE = kings.piece
@@ -808,30 +740,9 @@ def capture_piece():
 
 #b_game = Blackm()
 kings = Threat(False, None, None)
-#kings.CURRENT_PIECE = 32
-#kings.seek_threats(test, 32)
-#a = kings.kingSafety()
-#print "aaaa", a[0]
-#print kings.check
-#print kings.check
-#if kings.pieces_attacking == []:
-#    print "empty"
-#print board_view(test)
-
-#print kings.pieces_attacking
 
 def moving_randomly():
     turn()
-
-#turn_test()
-
-#chess_engine()
-
-#with open('posi', 'rb') as f:
-#    posi = pickle.load(f)
-
-#print board_view(posi)
-
 
 def turn():
     while True:
@@ -948,10 +859,12 @@ def search_checks(orig_fetched_moves, white_to_move):
 
 
 #moving_randomly()
-a_game = Whitem(False, False, True, newlist, newlist_B, _pieces, [], posi)
-print board_view(a_game.start)
+# a_game = Whitem(False, False, True, newlist, newlist_B, _pieces, [], posi)
+
+
+print board_view(posi)
 white_to_move = True
-fetched_moves = get_piece_moves(a_game.start, white_to_move, _pieces)
+fetched_moves = get_piece_moves(posi)
 orig_fetched_moves = list(fetched_moves)
 # print board_view(random_posi)
 
@@ -962,57 +875,7 @@ random_posi = random.choice(searched_moves[0][0])
 print "fetched len", len(fetched_moves[0])
 print board_view(random_posi)
 
-
 ###############
-
-# random_posi = random.choice(orig_fetched_moves[0])
-# white_to_move = bool_negation(white_to_move)
-# rotate(random_posi)
-# fetched_moves = get_piece_moves(random_posi, white_to_move, _pieces)
-#
-# # Search boards if one king is missing
-# for board in fetched_moves[0]:
-#     kings = [i for i, x in enumerate(board) if x in ['K', 'k']]
-#     print "kings", kings
-#     if len(kings) < 2:
-#         orig_fetched_moves[0].remove(random_posi)
-#         white_to_move = bool_negation(white_to_move)
-#         rotate(random_posi)
-#         print "yea"
-#         break
-
-
-# while len(kings) < 3:
-#     if len(fetched_moves[0]) == 1:
-#         break
-#     fetched_moves[0].remove(random_posi)
-#     random_posi = random.choice(fetched_moves[0])
-#     print "yea"
-#     kings = [i for i, x in enumerate(random_posi) if x in ['K', 'k']]
-
-
-# print "fetched", fetched_moves[0]
-
-
-# print "original position", board_view(fetched_moves[1])
-
-# white_to_move = False
-# rotate(random_posi)
-#
-# fetched_moves = get_piece_moves(random_posi, white_to_move, _pieces)
-# random_posi = random.choice(fetched_moves[0])
-# rotate(random_posi)
-
-
-
-# a_game.white_to_move = False
-# print a_game.white_to_move
-# print a_game.pieces
-# random_posi = random.choice(a_game.posis)
-# a_game.move_gen(random_posi)
-# random_posi = random.choice(a_game.posis)
-# print board_view(random_posi)
-
 
 toc = time.clock()
 print "time spent:", toc - tic

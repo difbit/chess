@@ -734,9 +734,6 @@ def capture_piece():
     if kings.check:
         PIECE = kings.piece
 
-
-        #print board_view(test)
-
 #b_game = Blackm()
 kings = Threat(False, None, None)
 
@@ -847,42 +844,19 @@ def search_checks(orig_fetched_moves, white_to_move):
 
         # Search boards if one king is missing
         for board in fetched_moves[0]:
-#             rotate(board)
-#             print board_view(board)
-#             rotate(board)
             kings = [i for i, x in enumerate(board) if x in ['K', 'k']]
-#             print "kings", kings
             if len(kings) < 2:
                 remove_these.append(posit)
                 break
-#                 orig_fetched_moves[0].remove(posit)
         rotate(posit)
     for rem in remove_these:
         orig_fetched_moves[0].remove(rotate(rem))
     white_to_move = bool_negation(white_to_move)
-#                 return search_checks(orig_fetched_moves, white_to_move)
     return orig_fetched_moves, white_to_move
 
 
 #moving_randomly()
 # a_game = Whitem(False, False, True, newlist, newlist_B, _pieces, [], posi)
-
-# for rand in searched_moves[0][0]:
-#     print board_view(rand)
-
-# def bit_board_move(random_posi, white_to_move, _pieces):
-#     fetched_moves = get_piece_moves(random_posi, white_to_move, _pieces)
-#     orig_fetched_moves = list(fetched_moves)
-#     searched_moves = search_checks(orig_fetched_moves, white_to_move)
-#     random_posi = random.choice(searched_moves[0][0])
-#     print "fetched len", len(fetched_moves[0])
-#     print board_view(random_posi)
-# #     white_to_move = searched_moves[1]
-# #     white_to_move = bool_negation(white_to_move)
-#     print "WHITE TO MOVE", white_to_move
-#     if searched_moves[0][0] == []:
-#         print "It is checkmate"
-#         exit()
 
 print board_view(posi)
 white_to_move = True
@@ -893,8 +867,6 @@ orig_fetched_moves = list(fetched_moves)
 searched_moves = search_checks(orig_fetched_moves, white_to_move)
 random_posi = random.choice(searched_moves[0][0])
 print board_view(random_posi)
-# rotate(random_posi)
-# white_to_move = searched_moves[1]
 print "WHITE TO MOVE", white_to_move
 
 while True:

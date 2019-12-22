@@ -35,18 +35,17 @@ posiii = [
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0                   #132-143
     ]
 
-#The board for testing moves and functions of different pieces.
-#Modify at will
+#The board for testing moves and functions of different pieces
 posi = [
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,                  #0-11
     0, 0, 0, 0, 0, 0 ,0, 0, 0, 0, 0, 0,                  #12-23
-    0, 0, '-', '-', '-', '-', 'q', '-', '-', '-', 0, 0,  #24-35     #26-33
-    0, 0, '-', '-', '-', 'q', '-', '-', '-', 'k', 0, 0,  #36-47     #38-45
+    0, 0, '-', '-', '-', '-', '-', '-', '-', '-', 0, 0,  #24-35     #26-33
+    0, 0, 'P', '-', '-', '-', '-', '-', '-', 'k', 0, 0,  #36-47     #38-45
     0, 0, '-', '-', '-', '-', '-', '-', '-', '-', 0, 0,  #48-59     #50-57
-    0, 0, '-', '-', '-', '-', '-', '-', '-', '-', 0, 0,  #60-71     #62-69
+    0, 0, '-', '-', '-', '-', 'p', '-', '-', '-', 0, 0,  #60-71     #62-69
     0, 0, '-', '-', '-', '-', '-', '-', '-', '-', 0, 0,  #72-83     #74-81
     0, 0, '-', '-', 'K', '-', '-', '-', '-', '-', 0, 0,  #84-95     #86-93
-    0, 0, '-', '-', '-', '-', '-', '-', '-', '-', 0, 0,  #96-107    #98-105
+    0, 0, '-', '-', '-', '-', '-', '-', 'p', '-', 0, 0,  #96-107    #98-105
     0, 0, '-', '-', '-', '-', '-', '-', '-', '-', 0, 0,  #108-119   #110-117
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,                  #120-131
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0                   #132-143
@@ -785,6 +784,7 @@ def get_piece_moves(posi, white_to_move, _pieces):
         _pieces = upper_case(_pieces)
     else:
         _pieces = lower_case(_pieces)
+#         posi = rotate(posi)
 
 #         self.posis.append(self.start)
 
@@ -798,11 +798,13 @@ def get_piece_moves(posi, white_to_move, _pieces):
         mod_posi = list(orig_posi)
         if OWN_PIECES != []:
             for enum_piece in OWN_PIECES:
+                # Count more moves for ranger pieces
                 if _pieces[piece] in ['R','Q','B','r','q','b']:
                     rang = 8
                 else:
                     rang = 2
                 for move in moves[piece]:
+                    # This checks if a pawn is on its original square
                     if (_pieces[piece] in ['P','p']) and (moves[piece][1] == move) and (enum_piece not in range(98,106)):
                         continue
                     ate_piece = False
@@ -818,8 +820,14 @@ def get_piece_moves(posi, white_to_move, _pieces):
                             # Check if pawn's move is in the first two items in the list
                             if _pieces[piece] in ['P','p'] and (move not in moves[piece][:2]):
                                 continue
+                        if _pieces[piece] in ['P','p'] and ((enum_piece + move * go) in range(26,34)):
+                            if _pieces[piece].isupper():
+                                mod_posi[enum_piece] = 'Q'
+                            else: mod_posi[enum_piece] = 'q'
+
                         mod_posi[enum_piece], mod_posi[enum_piece + move * go] = \
                         original_square, mod_posi[enum_piece]
+
                         positions.append(mod_posi)
                         mod_posi = list(orig_posi)
                         if ate_piece:
@@ -828,7 +836,6 @@ def get_piece_moves(posi, white_to_move, _pieces):
 
 def bool_negation(bool):
     return not bool
-
 
 def search_checks(orig_fetched_moves, white_to_move):
     white_to_move = bool_negation(white_to_move)
@@ -851,8 +858,8 @@ def search_checks(orig_fetched_moves, white_to_move):
 #                 orig_fetched_moves[0].remove(posit)
         rotate(posit)
     for rem in remove_these:
-        orig_fetched_moves[0].remove(rem)
-#     white_to_move = bool_negation(white_to_move)
+        orig_fetched_moves[0].remove(rotate(rem))
+    white_to_move = bool_negation(white_to_move)
 #                 return search_checks(orig_fetched_moves, white_to_move)
     return orig_fetched_moves, white_to_move
 
@@ -863,33 +870,36 @@ def search_checks(orig_fetched_moves, white_to_move):
 # for rand in searched_moves[0][0]:
 #     print board_view(rand)
 
-def bit_board_move(random_posi, white_to_move, _pieces):
-    fetched_moves = get_piece_moves(random_posi, white_to_move, _pieces)
-    orig_fetched_moves = list(fetched_moves)
-    searched_moves = search_checks(orig_fetched_moves, white_to_move)
-    random_posi = random.choice(searched_moves[0][0])
-    print "fetched len", len(fetched_moves[0])
-    print board_view(random_posi)
-#     white_to_move = searched_moves[1]
-    white_to_move = bool_negation(white_to_move)
-    print "WHITE TO MOVE", white_to_move
-    if searched_moves[0][0] == []:
-        print "It is checkmate"
-        exit()
+# def bit_board_move(random_posi, white_to_move, _pieces):
+#     fetched_moves = get_piece_moves(random_posi, white_to_move, _pieces)
+#     orig_fetched_moves = list(fetched_moves)
+#     searched_moves = search_checks(orig_fetched_moves, white_to_move)
+#     random_posi = random.choice(searched_moves[0][0])
+#     print "fetched len", len(fetched_moves[0])
+#     print board_view(random_posi)
+# #     white_to_move = searched_moves[1]
+# #     white_to_move = bool_negation(white_to_move)
+#     print "WHITE TO MOVE", white_to_move
+#     if searched_moves[0][0] == []:
+#         print "It is checkmate"
+#         exit()
 
 print board_view(posi)
 white_to_move = True
+
+# Change starting position here
 fetched_moves = get_piece_moves(posi, white_to_move, _pieces)
 orig_fetched_moves = list(fetched_moves)
 searched_moves = search_checks(orig_fetched_moves, white_to_move)
 random_posi = random.choice(searched_moves[0][0])
-print "fetched len", len(fetched_moves[0])
 print board_view(random_posi)
-white_to_move = searched_moves[1]
+# rotate(random_posi)
+# white_to_move = searched_moves[1]
 print "WHITE TO MOVE", white_to_move
 
 while True:
-#     bit_board_move(random_posi, white_to_move, _pieces)
+    white_to_move = bool_negation(white_to_move)
+    rotate(random_posi)
     fetched_moves = get_piece_moves(random_posi, white_to_move, _pieces)
     orig_fetched_moves = list(fetched_moves)
     searched_moves = search_checks(orig_fetched_moves, white_to_move)
@@ -897,11 +907,12 @@ while True:
         print "It is checkmate or stalemate"
         exit()
     random_posi = random.choice(searched_moves[0][0])
-    print "fetched len", len(fetched_moves[0])
-    print board_view(random_posi)
-    white_to_move = searched_moves[1]
-#     white_to_move = bool_negation(white_to_move)
+    if not white_to_move:
+        print board_view(rotate(list(random_posi)))
+    else:
+        print board_view(random_posi)
     print "WHITE TO MOVE", white_to_move
+    time.sleep(0.7)
 ###############
 
 toc = time.clock()

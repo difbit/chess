@@ -39,14 +39,14 @@ posiii = [
 posi = [
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,                  #0-11
     0, 0, 0, 0, 0, 0 ,0, 0, 0, 0, 0, 0,                  #12-23
-    0, 0, '-', '-', '-', '-', '-', '-', '-', '-', 0, 0,  #24-35     #26-33
-    0, 0, 'P', '-', '-', '-', '-', '-', '-', 'k', 0, 0,  #36-47     #38-45
+    0, 0, 'r', '-', '-', '-', 'k', '-', '-', 'r', 0, 0,  #24-35     #26-33
+    0, 0, '-', '-', '-', '-', '-', '-', '-', '-', 0, 0,  #36-47     #38-45
     0, 0, '-', '-', '-', '-', '-', '-', '-', '-', 0, 0,  #48-59     #50-57
-    0, 0, '-', '-', '-', '-', 'p', '-', '-', '-', 0, 0,  #60-71     #62-69
+    0, 0, '-', '-', '-', '-', '-', '-', '-', '-', 0, 0,  #60-71     #62-69
     0, 0, '-', '-', '-', '-', '-', '-', '-', '-', 0, 0,  #72-83     #74-81
-    0, 0, '-', '-', 'K', '-', '-', '-', '-', '-', 0, 0,  #84-95     #86-93
-    0, 0, '-', '-', '-', '-', '-', '-', 'p', '-', 0, 0,  #96-107    #98-105
-    0, 0, '-', '-', '-', '-', '-', '-', '-', '-', 0, 0,  #108-119   #110-117
+    0, 0, '-', '-', '-', '-', '-', '-', '-', '-', 0, 0,  #84-95     #86-93
+    0, 0, '-', '-', '-', '-', '-', '-', '-', '-', 0, 0,  #96-107    #98-105
+    0, 0, 'R', '-', '-', '-', 'K', '-', '-', 'R', 0, 0,  #108-119   #110-117
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,                  #120-131
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0                   #132-143
     ]
@@ -75,7 +75,7 @@ moves = {
 "knight" : [Y+Y-X, Y+Y+X, X+X+Y, X+X-Y, -Y-Y+X, -Y-Y-X, -X-X-Y, -X-X+Y],
 "bishop" : [X+Y, X-Y, -X+Y, -X-Y],
 "queen" : [X, Y, -X, -Y, X+Y, X-Y, -X+Y, -X-Y],
-"king" : [X, Y, -X, -Y, X+Y, X-Y, -X+Y, -X-Y],
+"king" : [X, Y, -X, -Y, X+Y, X-Y, -X+Y, -X-Y, -X-X, X+X], # Last two moves are for castling
 "pawn" : [-Y, -Y-Y, -Y+X, -Y-X]
 }
 
@@ -83,18 +83,32 @@ moves = {
 #and it is other player's move.
 def rotate(BOARD):
     for SQUARE in range(0, 8):
-        BOARD[26+SQUARE], BOARD[117-SQUARE] \
-        = BOARD[117-SQUARE], BOARD[26+SQUARE]
+        BOARD[26+SQUARE], BOARD[110+SQUARE] \
+        = BOARD[110+SQUARE], BOARD[26+SQUARE]
     for SQUARE in range(0, 8):
-        BOARD[38+SQUARE], BOARD[105-SQUARE] \
-        = BOARD[105-SQUARE], BOARD[38+SQUARE]
+        BOARD[38+SQUARE], BOARD[98+SQUARE] \
+        = BOARD[98+SQUARE], BOARD[38+SQUARE]
     for SQUARE in range(0, 8):
-        BOARD[50+SQUARE], BOARD[93-SQUARE] \
-        = BOARD[93-SQUARE], BOARD[50+SQUARE]
+        BOARD[50+SQUARE], BOARD[86+SQUARE] \
+        = BOARD[86+SQUARE], BOARD[50+SQUARE]
     for SQUARE in range(0, 8):
-        BOARD[62+SQUARE], BOARD[81-SQUARE] \
-        = BOARD[81-SQUARE], BOARD[62+SQUARE]
+        BOARD[62+SQUARE], BOARD[74+SQUARE] \
+        = BOARD[74+SQUARE], BOARD[62+SQUARE]
     return BOARD
+# def rotate(BOARD):
+#     for SQUARE in range(0, 8):
+#         BOARD[26+SQUARE], BOARD[117-SQUARE] \
+#         = BOARD[117-SQUARE], BOARD[26+SQUARE]
+#     for SQUARE in range(0, 8):
+#         BOARD[38+SQUARE], BOARD[105-SQUARE] \
+#         = BOARD[105-SQUARE], BOARD[38+SQUARE]
+#     for SQUARE in range(0, 8):
+#         BOARD[50+SQUARE], BOARD[93-SQUARE] \
+#         = BOARD[93-SQUARE], BOARD[50+SQUARE]
+#     for SQUARE in range(0, 8):
+#         BOARD[62+SQUARE], BOARD[81-SQUARE] \
+#         = BOARD[81-SQUARE], BOARD[62+SQUARE]
+#     return BOARD
 
 
 white_pieces = {
@@ -240,12 +254,23 @@ def capture_piece():
     if kings.check:
         PIECE = kings.piece
 
+king_rook_move = {'K': {'ROOK_Q': False,'ROOK_K': False,'KING': False},
+        'k': {'ROOK_Q': False,'ROOK_K': False,'KING': False}}
+
+def empty_squares(lst):
+    for item in lst:
+        if item != '-':
+            return False
+    return True
+
 def get_piece_moves(posi, white_to_move, _pieces):
 
     if white_to_move:
         _pieces = upper_case(_pieces)
+#         king_rook_move = white_king_and_rook_move
     else:
         _pieces = lower_case(_pieces)
+#         king_rook_move = black_king_and_rook_move
 #         posi = rotate(posi)
 
 #         self.posis.append(self.start)
@@ -253,6 +278,7 @@ def get_piece_moves(posi, white_to_move, _pieces):
     positions = []
 
     OWN_PIECES = []
+
 
     for piece in _pieces:
         orig_posi = list(posi)
@@ -267,12 +293,98 @@ def get_piece_moves(posi, white_to_move, _pieces):
                 else:
                     rang = 2
                 for move in moves[piece]:
+                    # Check where king and rooks are
+                    if (_pieces[piece] in ['K','k']) and \
+                            (move in moves[piece][-2:]):
+                        if (mod_posi[117] not in ['R', 'r']) and \
+                            (not all(x=='-' for x in posi[115:116])) and \
+                            ((king_rook_move.get(_pieces[piece])['ROOK_K'] == True) or \
+                            (king_rook_move.get(_pieces[piece])['KING'] == True)):
+                            continue
+                        if (mod_posi[110] not in ['R', 'r']) and \
+                            (not all(x=='-' for x in posi[111:113])) and \
+                            ((king_rook_move.get(_pieces[piece])['ROOK_Q'] == True) or \
+                            (king_rook_move.get(_pieces[piece])['KING'] == True)):
+                            continue
+
+#                             (move in moves[piece][-2:]) and \
+#                             (enum_piece != 114) and \
+#                             (not bool(set(
+#                                 [i for i, x in enumerate(mod_posi)
+#                                  if x == _pieces['rook']
+#                                  ]).intersection([110, 117]))):
+#                         print "THIS TRUE?"
+#                         continue
+
+
                     # This checks if a pawn is on its original square
                     if (_pieces[piece] in ['P','p']) and \
                             (moves[piece][1] == move) and \
                             (enum_piece not in range(98,106)):
                         continue
                     ate_piece = False
+
+                    if _pieces[piece] in ['K','k']:
+                       # print "KING ROOK MOVE", king_rook_move.get('ROOK_Q')
+                       # print "KING ROOK MOVE KING", king_rook_move.get('KING')
+                        #print "EMPTY", empty_squares(mod_posi[113:114])
+                       # print "MOVE TRUE", move == moves[piece][8]
+#                                 (king_rook_move.get('ROOK_Q') == False) and \
+#                                 (king_rook_move.get('KING') == False) and \
+                        if (move == moves[piece][-2]): #and \
+#                                 all(x=='-' for x in posi[111:113]) and \
+#                                 posi[114] in ['K', 'k']:
+
+                            mod_posi[110], mod_posi[113] = \
+                                    mod_posi[113], mod_posi[110]
+
+#                             mod_posi[110], mod_posi[111], mod_posi[112], \
+#                             mod_posi[113], mod_posi[114] \
+#                             = mod_posi[113], mod_posi[112], \
+#                             mod_posi[114], mod_posi[110], mod_posi[111]
+
+                                #(empty_squares(mod_posi[113:114]) == True):
+                            #print "CASTLE"
+                            #print "ROOK PIECE", _pieces['rook']
+#                                 rook_place = [
+#                                        i for i, x in enumerate(mod_posi)
+#                                        if x == _pieces['rook']
+#                                 ]
+#                                 print "ROOK PLACE", rook_place
+#                                 mod_posi[110], mod_posi[113] = '-', _pieces['rook']
+                                #print "PIECES", _pieces['rook']
+#                             positions.append(mod_posi)
+#                             mod_posi = list(orig_posi)
+#                             continue
+#                                 (king_rook_move.get('ROOK_K') == False) and \
+#                                 (king_rook_move.get('KING') == False) and \
+                        if (move == moves[piece][-1]): #and \
+#                                 (mod_posi[117] in ['R', 'r']) and \
+#                                 mod_posi[115] == mod_posi[116] == '-' and \
+#                                 mod_posi[114] in ['K', 'k']:
+
+                            mod_posi[117], mod_posi[115] = \
+                                    mod_posi[115], mod_posi[117]
+
+
+#                             mod_posi[114], mod_posi[115], mod_posi[116], \
+#                             mod_posi[117] = mod_posi[115], mod_posi[117], \
+#                             mod_posi[114], mod_posi[116]
+                            #print "KING SIDE CASTLE"
+                                #(empty_squares(mod_posi[114:115])):
+#                                 rook_place = [
+#                                        i for i, x in enumerate(mod_posi)
+#                                        if x == _pieces['rook']
+#                                 ]
+#                                 print "ROOK PLACE", rook_place
+#                                 mod_posi[117] = '-'
+#                                 mod_posi[enum_piece + move * go -1] = _pieces['rook']
+                            #mod_posi[115] = _pieces['rook']
+#                             positions.append(mod_posi)
+#                             mod_posi = list(orig_posi)
+#                             continue
+
+
                     for go in range(1, rang):
 #                             print mod_posi[enum_piece + move * go]
                         if mod_posi[enum_piece + move * go] in \
@@ -294,8 +406,16 @@ def get_piece_moves(posi, white_to_move, _pieces):
                                 mod_posi[enum_piece] = 'Q'
                             else: mod_posi[enum_piece] = 'q'
 
+
                         mod_posi[enum_piece], mod_posi[enum_piece + move * go]\
                                 = original_square, mod_posi[enum_piece]
+
+                       # if _pieces[piece] in ['K', 'k']:
+                       #     king_rook_move['KING'] = True
+                       # if (enum_piece == 98) and _pieces[piece] in ['R', 'r']:
+                       #     king_rook_move['ROOK_Q'] = True
+                       # if (enum_piece == 106) and _pieces[piece] in ['R', 'r']:
+                       #     king_rook_move['ROOK_K'] = True
 
                         positions.append(mod_posi)
                         mod_posi = list(orig_posi)
@@ -324,21 +444,38 @@ def search_checks(orig_fetched_moves, white_to_move):
     for rem in remove_these:
         orig_fetched_moves[0].remove(rotate(rem))
     white_to_move = bool_negation(white_to_move)
+    print "LEN ORIG", len(orig_fetched_moves)
     return orig_fetched_moves, white_to_move
 
 
 #moving_randomly()
 # a_game = Whitem(False, False, True, newlist, newlist_B, _pieces, [], posi)
 
-print board_view(posi)
+print board_view(posiii)
 white_to_move = True
 
 # Change starting position here
-fetched_moves = get_piece_moves(posi, white_to_move, _pieces)
+fetched_moves = get_piece_moves(posiii, white_to_move, _pieces)
 orig_fetched_moves = list(fetched_moves)
 searched_moves = search_checks(orig_fetched_moves, white_to_move)
+#print "SEARCHED MOVES", searched_moves
 random_posi = random.choice(searched_moves[0][0])
 print board_view(random_posi)
+if white_to_move:
+    if random_posi[110] != 'R':
+        king_rook_move['K']['ROOK_K'] = True
+    if random_posi[117] != 'R':
+        king_rook_move['K']['ROOK_Q'] = True
+    if random_posi[114] != 'K':
+        king_rook_move['K']['KING'] = True
+else:
+    if random_posi[110] != 'r':
+        king_rook_move['k']['ROOK_K'] = True
+    if random_posi[117] != 'r':
+        king_rook_move['k']['ROOK_Q'] = True
+    if random_posi[114] != 'k':
+        king_rook_move['k']['KING'] = True
+
 print "WHITE TO MOVE", white_to_move
 
 while True:
@@ -351,12 +488,28 @@ while True:
         print "It is checkmate or stalemate"
         exit()
     random_posi = random.choice(searched_moves[0][0])
+    if white_to_move:
+        if random_posi[110] != 'R':
+            king_rook_move['K']['ROOK_K'] = True
+        if random_posi[117] != 'R':
+            king_rook_move['K']['ROOK_Q'] = True
+        if random_posi[114] != 'K':
+            king_rook_move['K']['KING'] = True
+    else:
+        if random_posi[110] != 'r':
+            king_rook_move['k']['ROOK_K'] = True
+        if random_posi[117] != 'r':
+            king_rook_move['k']['ROOK_Q'] = True
+        if random_posi[114] != 'k':
+            king_rook_move['k']['KING'] = True
+    print king_rook_move
+    print random_posi[114]
     if not white_to_move:
         print board_view(rotate(list(random_posi)))
     else:
         print board_view(random_posi)
     print "WHITE TO MOVE", white_to_move
-    time.sleep(0.7)
+    time.sleep(4.7)
 ###############
 
 toc = time.clock()

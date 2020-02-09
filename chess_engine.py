@@ -79,8 +79,9 @@ moves = {
 "pawn" : [-Y, -Y-Y, -Y+X, -Y-X]
 }
 
-#The function for rotating the board; used when a move is made
-#and it is other player's move.
+# The function for rotating the board; used when a move is made
+# and it is other player's move.
+# This now works like a mirror.
 def rotate(BOARD):
     for SQUARE in range(0, 8):
         BOARD[26+SQUARE], BOARD[110+SQUARE] \
@@ -95,11 +96,6 @@ def rotate(BOARD):
         BOARD[62+SQUARE], BOARD[74+SQUARE] \
         = BOARD[74+SQUARE], BOARD[62+SQUARE]
     return BOARD
-
-white_pieces = {
-    "king": 'K', "rook": 'R', "pawn": 'P',
-    "knight": 'N', "queen": 'Q', "bishop": 'B'
-    }
 
 _pieces = {
     "king": 'K', "rook": 'R', "pawn": 'P',
@@ -123,23 +119,6 @@ def low(d):
     new = dict((k.lower(), v) for k,v in d.iteritems())
     return new
 
-#Two lists for positions and lists of moves for White and Black
-newlist = {'K': [], 'R': [], 'P': [], 'N': [], 'Q': [], 'B': []} #White
-position = {'K': [], 'R': [], 'P': [], 'N': [], 'Q': [], 'B': []} #White
-newlist_B = {'k': [], 'r': [], 'p': [], 'n': [], 'q': [], 'b': []} #Black
-position_B = {'k': [], 'r': [], 'p': [], 'n': [], 'q': [], 'b': []} #Black
-RANGE_SQUARE_NUMBERS = []
-RANGE_SQUARES = []
-enemy = []
-enemy_w = []
-ene = []
-PIECE_POSITIONS = []
-
-# These will be implemented to prevent castling
-#kingmove = False
-#rookmove = False
-
-CHECKING_SQUARE_LIST = []
 
 def save_list(target_list):
     with open('target_list', 'wb') as f:
@@ -194,7 +173,6 @@ class board_object(object):
 def chess_engine(): #This will be used for the evaluation function
 
     BOARD_LIST = []
-
     EVALUATIONS = []
 
     depth = 0
@@ -206,7 +184,6 @@ def chess_engine(): #This will be used for the evaluation function
     LIMIT = 50
 
     while depth < LIMIT:
-
         a_game.move_gen(posi)
         #print board_view(posi)
         #if first_save:
@@ -256,9 +233,7 @@ def get_piece_moves(posi, white_to_move, _pieces):
         _pieces = lower_case(_pieces)
 
     positions = []
-
     OWN_PIECES = []
-
 
     for piece in _pieces:
         orig_posi = list(posi)
@@ -296,7 +271,6 @@ def get_piece_moves(posi, white_to_move, _pieces):
 
                     if _pieces[piece] in ['K','k']:
                         if (move == moves[piece][-2]):
-
                             mod_posi[110], mod_posi[113] = \
                                     mod_posi[113], mod_posi[110]
 
@@ -323,7 +297,6 @@ def get_piece_moves(posi, white_to_move, _pieces):
                             if _pieces[piece].isupper():
                                 mod_posi[enum_piece] = 'Q'
                             else: mod_posi[enum_piece] = 'q'
-
 
                         mod_posi[enum_piece], mod_posi[enum_piece + move * go]\
                                 = original_square, mod_posi[enum_piece]
@@ -355,12 +328,7 @@ def search_checks(orig_fetched_moves, white_to_move):
     for rem in remove_these:
         orig_fetched_moves[0].remove(rotate(rem))
     white_to_move = bool_negation(white_to_move)
-    print "LEN ORIG", len(orig_fetched_moves)
     return orig_fetched_moves, white_to_move
-
-
-#moving_randomly()
-# a_game = Whitem(False, False, True, newlist, newlist_B, _pieces, [], posi)
 
 print board_view(posiii)
 white_to_move = True

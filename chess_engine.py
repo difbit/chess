@@ -341,25 +341,34 @@ def search_checks(orig_fetched_moves, white_to_move):
     white_to_move = bool_negation(white_to_move)
     return orig_fetched_moves, white_to_move
 
-# I will continue with this later on
-def play_move(posi):
+def play_move(position, searched_moves):
     while True:
+        pos = list(position)
         print "Select a piece from: \n%s" % sorted(player_posi.keys())
-        square = raw_input()
-        print "Select destination square from: \n%s" % sorted(player_posi.keys())
+        start = raw_input()
+        print "Select a destination square from: \n%s" % sorted(player_posi.keys())
         dest = raw_input()
+        start_posi = player_posi[start]
+        dest_posi = player_posi[dest]
+        if pos[dest_posi] != '-':
+            square = '-'
+        else: 
+            square = pos[dest_posi]
+
         if (
-                not player_posi.get(square) and player_posi.get(dest)
-                or square == dest
+                not player_posi.get(start) and player_posi.get(dest)
+                or start == dest
             ):
             print "Invalid square"
             continue
         else:
-            break
+            pos[start_posi], pos[dest_posi] = square, pos[start_posi]
+            print "DEST", posi[player_posi[dest]]
+            if pos in searched_moves:
+                return pos
+            else:
+                continue
 
-
-
-play_move(posiii)
 
 print board_view(posiii)
 white_to_move = True
@@ -369,7 +378,10 @@ fetched_moves = get_piece_moves(posiii, white_to_move, _pieces)
 orig_fetched_moves = list(fetched_moves)
 searched_moves = search_checks(orig_fetched_moves, white_to_move)
 #print "SEARCHED MOVES", searched_moves
-random_posi = random.choice(searched_moves[0][0])
+
+random_posi = play_move(posiii, searched_moves[0][0])
+
+#random_posi = random.choice(searched_moves[0][0])
 print board_view(random_posi)
 if white_to_move:
     if random_posi[110] != 'R':
@@ -386,7 +398,7 @@ else:
     if random_posi[114] != 'k':
         king_rook_move['k']['KING'] = True
 
-print "WHITE TO MOVE", white_to_move
+#print "WHITE TO MOVE", white_to_move
 
 while True:
     white_to_move = bool_negation(white_to_move)
@@ -397,7 +409,12 @@ while True:
     if searched_moves[0][0] == []:
         print "It is checkmate or stalemate"
         exit()
-    random_posi = random.choice(searched_moves[0][0])
+
+    if white_to_move:
+        random_posi = play_move(random_posi, searched_moves[0][0])
+    else:
+        random_posi = random.choice(searched_moves[0][0])
+
     if white_to_move:
         if random_posi[110] != 'R':
             king_rook_move['K']['ROOK_Q'] = True
@@ -412,13 +429,13 @@ while True:
             king_rook_move['k']['ROOK_K'] = True
         if random_posi[114] != 'k':
             king_rook_move['k']['KING'] = True
-    print king_rook_move
-    print random_posi[114]
+    #print king_rook_move
+    #print random_posi[114]
     if not white_to_move:
         print board_view(rotate(list(random_posi)))
     else:
         print board_view(random_posi)
-    print "WHITE TO MOVE", white_to_move
+    #print "WHITE TO MOVE", white_to_move
     time.sleep(4.7)
 ###############
 

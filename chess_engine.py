@@ -51,6 +51,17 @@ posi = [
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0                   #132-143
     ]
 
+player_posi = {
+    'a8': 26, 'b8': 27, 'c8': 28, 'd8': 29, 'e8': 30, 'f8': 31, 'g8': 32, 'h8': 33, 
+    'a7': 38, 'b7': 39, 'c7': 40, 'd7': 41, 'e7': 42, 'f7': 43, 'g7': 44, 'h7': 45, 
+    'a6': 50, 'b6': 51, 'c6': 52, 'd6': 53, 'e6': 54, 'f6': 55, 'g6': 56, 'h6': 57, 
+    'a5': 62, 'b5': 63, 'c5': 64, 'd5': 65, 'e5': 66, 'f5': 67, 'g5': 68, 'h5': 69,
+    'a4': 74, 'b4': 75, 'c4': 76, 'd4': 77, 'e4': 78, 'f4': 79, 'g4': 80, 'h4': 81,
+    'a3': 86, 'b3': 87, 'c3': 88, 'd3': 89, 'e3': 90, 'f3': 91, 'g3': 92, 'h3': 93,
+    'a2': 98, 'b2': 99, 'c2': 100, 'd2': 101, 'e2': 102, 'f2': 103, 'g2': 104, 'h2': 105,
+    'a1': 110, 'b1': 111, 'c1': 112, 'd1': 113, 'e1': 114, 'f1': 115, 'g1': 116, 'h1': 117,
+}
+
 #Used for printing the board
 def board_view(list):
     view = [list[i:i + 12] for i in xrange(0, 11, 12)]
@@ -329,6 +340,26 @@ def search_checks(orig_fetched_moves, white_to_move):
         orig_fetched_moves[0].remove(rotate(rem))
     white_to_move = bool_negation(white_to_move)
     return orig_fetched_moves, white_to_move
+
+# I will continue with this later on
+def play_move(posi):
+    while True:
+        print "Select a piece from: \n%s" % sorted(player_posi.keys())
+        square = raw_input()
+        print "Select destination square from: \n%s" % sorted(player_posi.keys())
+        dest = raw_input()
+        if (
+                not player_posi.get(square) and player_posi.get(dest)
+                or square == dest
+            ):
+            print "Invalid square"
+            continue
+        else:
+            break
+
+
+
+play_move(posiii)
 
 print board_view(posiii)
 white_to_move = True

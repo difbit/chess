@@ -46,7 +46,7 @@ posi = [
     0, 0, '-', '-', '-', '-', '-', '-', '-', '-', 0, 0,  # 72-83     # 74-81
     0, 0, '-', '-', '-', '-', '-', '-', '-', '-', 0, 0,  # 84-95     # 86-93
     0, 0, '-', '-', '-', '-', '-', '-', '-', '-', 0, 0,  # 96-107    # 98-105
-    0, 0, 'R', '-', '-', '-', 'K', '-', '-', 'R', 0, 0,  # 108-119   # 110-117
+    0, 0, 'R', '-', 'B', '-', 'K', '-', '-', 'R', 0, 0,  # 108-119   # 110-117
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,                  # 120-131
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0                   # 132-143
     ]
@@ -287,16 +287,27 @@ def get_piece_moves(posi, white_to_move, _pieces):
                     # Check where king and rooks are
                     if (_pieces[piece] in ['K', 'k']) and \
                             (move in moves[piece][-2:]):
-                        if (not mod_posi[117] in ['R', 'r']) and \
-                                (any(x != '-' for x in mod_posi[115:117])) and \
-                                ((king_rook_move.get(_pieces[piece])['ROOK_K'] == True) or
-                                    (king_rook_move.get(_pieces[piece])['KING'] == True)):
-                            continue
-                        if (mod_posi[110] not in ['R', 'r']) and \
-                                (any(x != '-' for x in mod_posi[111:114])) and \
-                                ((king_rook_move.get(_pieces[piece])['ROOK_Q'] == True) or
-                                    (king_rook_move.get(_pieces[piece])['KING'] == True)):
-                            continue
+
+                        # Left some prints for testing
+                        #print("MOD POSI R", not mod_posi[117] in ['R', 'r'])
+                        #print("MOD ANY", any(x != '-' for x in mod_posi[115:117]))
+                        #print("KING ROOK MOVE rook r", king_rook_move.get(_pieces[piece])['ROOK_K'])
+                        #print("KING ROOK MOVE king", king_rook_move.get(_pieces[piece])['KING'])
+                        #print("moved piece", moves[piece])
+                        #print("moved", move)
+
+                        if move == 2:
+                            if (not mod_posi[117] in ['R', 'r']) or \
+                                    (any(x != '-' for x in mod_posi[115:117])) or \
+                                    ((king_rook_move.get(_pieces[piece])['ROOK_K']) or
+                                        (king_rook_move.get(_pieces[piece])['KING'])):
+                                continue
+                        if move == -2:
+                            if (mod_posi[110] not in ['R', 'r']) or \
+                                    (any(x != '-' for x in mod_posi[111:114])) or \
+                                    ((king_rook_move.get(_pieces[piece])['ROOK_Q']) or
+                                        (king_rook_move.get(_pieces[piece])['KING'])):
+                                continue
 
                     # This checks if a pawn is on its original square
                     if (_pieces[piece] in ['P', 'p']) and \
@@ -404,7 +415,7 @@ def play_move(position, searched_moves):
                 continue
 
 
-position = list(posi)
+position = list(posiii)
 print(board_view(position))
 white_to_move = True
 
@@ -414,6 +425,7 @@ orig_fetched_moves = list(fetched_moves)
 searched_moves = search_checks(orig_fetched_moves, white_to_move)
 #print("SEARCHED MOVES", searched_moves)
 
+#print("KING ROOK MOVE", king_rook_move)
 random_posi = play_move(position, searched_moves[0][0])
 
 #random_posi = random.choice(searched_moves[0][0])
@@ -449,6 +461,8 @@ while True:
         random_posi = play_move(random_posi, searched_moves[0][0])
     else:
         random_posi = random.choice(searched_moves[0][0])
+
+    #print("KING ROOK MOVE", king_rook_move)
 
     if white_to_move:
         if random_posi[110] != 'R':

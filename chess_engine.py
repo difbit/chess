@@ -383,6 +383,12 @@ def play_move(position, searched_moves):
         else:
             square = pos[dest_posi]
 
+        if start == 'e1' and dest == 'c1':
+            pos[110], pos[113] = pos[113], pos[110]
+
+        if start == 'e1' and dest == 'g1':
+            pos[115], pos[117] = pos[117], pos[115]
+
         if (
                 not player_posi.get(start) and player_posi.get(dest)
                 or start == dest

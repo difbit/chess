@@ -13,9 +13,9 @@ tic = time.process_time()
 
 CHECKLIST_ONE = [24, 35, 108, 119]
 CHECKLIST_TWO = [25, 26, 27, 28, 29, 30, 31, 32, 33, 34,
-                36, 48, 60, 72, 84, 96, 109, 110, 111, 112,
-                113, 114, 115, 116, 117, 118, 95, 83, 71, 59,
-                47]
+                 36, 48, 60, 72, 84, 96, 109, 110, 111, 112,
+                 113, 114, 115, 116, 117, 118, 95, 83, 71, 59,
+                 47]
 
 """Use these two boards to play around"""
 
@@ -108,16 +108,16 @@ moves = {
 def rotate(BOARD):
     for SQUARE in range(0, 8):
         BOARD[26+SQUARE], BOARD[110+SQUARE] \
-        = BOARD[110+SQUARE], BOARD[26+SQUARE]
+            = BOARD[110+SQUARE], BOARD[26+SQUARE]
     for SQUARE in range(0, 8):
         BOARD[38+SQUARE], BOARD[98+SQUARE] \
-        = BOARD[98+SQUARE], BOARD[38+SQUARE]
+            = BOARD[98+SQUARE], BOARD[38+SQUARE]
     for SQUARE in range(0, 8):
         BOARD[50+SQUARE], BOARD[86+SQUARE] \
-        = BOARD[86+SQUARE], BOARD[50+SQUARE]
+            = BOARD[86+SQUARE], BOARD[50+SQUARE]
     for SQUARE in range(0, 8):
         BOARD[62+SQUARE], BOARD[74+SQUARE] \
-        = BOARD[74+SQUARE], BOARD[62+SQUARE]
+            = BOARD[74+SQUARE], BOARD[62+SQUARE]
     return BOARD
 
 _pieces = {
@@ -164,7 +164,7 @@ class Evaluate(object):
 
     def evaluation_function(self):
         piece_values = {
-        'B': 310, 'N': 300, 'P': 100, 'R': 500, 'Q': 900, 'K': 10000
+            'B': 310, 'N': 300, 'P': 100, 'R': 500, 'Q': 900, 'K': 10000
         }
 
         sum = 0
@@ -241,12 +241,15 @@ def chess_engine(): #This will be used for the evaluation function
     print(board_view(BOARD_LIST[LIMIT].posi))
     #Boards could be keys and evaluations values in dictionary
 
+
 def capture_piece():
     if kings.check:
         PIECE = kings.piece
 
-king_rook_move = {'K': {'ROOK_Q': False,'ROOK_K': False,'KING': False},
-        'k': {'ROOK_Q': False,'ROOK_K': False,'KING': False}}
+
+king_rook_move = {'K': {'ROOK_Q': False, 'ROOK_K': False, 'KING': False},
+                  'k': {'ROOK_Q': False, 'ROOK_K': False, 'KING': False}}
+
 
 def empty_squares(lst):
     for item in lst:
@@ -254,7 +257,11 @@ def empty_squares(lst):
             return False
     return True
 
+
 def get_piece_moves(posi, white_to_move, _pieces):
+    """ The main function to search moves. Note that
+     the position is always rotated before checking the
+     available moves. """
 
     if white_to_move:
         _pieces = upper_case(_pieces)
@@ -266,44 +273,44 @@ def get_piece_moves(posi, white_to_move, _pieces):
 
     for piece in _pieces:
         orig_posi = list(posi)
-        OWN_PIECES = [i for i, x in enumerate(orig_posi) \
-                if x == _pieces[piece]]
+        OWN_PIECES = [i for i, x in enumerate(orig_posi)
+                      if x == _pieces[piece]]
         mod_posi = list(orig_posi)
         if OWN_PIECES != []:
             for enum_piece in OWN_PIECES:
-                # Count more moves for ranger pieces
-                if _pieces[piece] in ['R','Q','B','r','q','b']:
+                # Count more moves for ranged pieces
+                if _pieces[piece] in ['R', 'Q', 'B', 'r', 'q', 'b']:
                     rang = 8
                 else:
                     rang = 2
                 for move in moves[piece]:
                     # Check where king and rooks are
-                    if (_pieces[piece] in ['K','k']) and \
+                    if (_pieces[piece] in ['K', 'k']) and \
                             (move in moves[piece][-2:]):
                         if (not mod_posi[117] in ['R', 'r']) and \
                                 (any(x != '-' for x in mod_posi[115:117])) and \
-                                ((king_rook_move.get(_pieces[piece])['ROOK_K'] == True) or \
-                                (king_rook_move.get(_pieces[piece])['KING'] == True)):
+                                ((king_rook_move.get(_pieces[piece])['ROOK_K'] == True) or
+                                    (king_rook_move.get(_pieces[piece])['KING'] == True)):
                             continue
                         if (mod_posi[110] not in ['R', 'r']) and \
                                 (any(x != '-' for x in mod_posi[111:114])) and \
-                                ((king_rook_move.get(_pieces[piece])['ROOK_Q'] == True) or \
-                                (king_rook_move.get(_pieces[piece])['KING'] == True)):
+                                ((king_rook_move.get(_pieces[piece])['ROOK_Q'] == True) or
+                                    (king_rook_move.get(_pieces[piece])['KING'] == True)):
                             continue
 
                     # This checks if a pawn is on its original square
-                    if (_pieces[piece] in ['P','p']) and \
+                    if (_pieces[piece] in ['P', 'p']) and \
                             (moves[piece][1] == move) and \
                             (enum_piece not in range(98,106)):
                         continue
                     ate_piece = False
 
-                    if _pieces[piece] in ['K','k']:
-                        if (move == moves[piece][-2]):
+                    if _pieces[piece] in ['K', 'k']:
+                        if move == moves[piece][-2]:
                             mod_posi[110], mod_posi[113] = \
                                     mod_posi[113], mod_posi[110]
 
-                        if (move == moves[piece][-1]):
+                        if move == moves[piece][-1]:
                             mod_posi[117], mod_posi[115] = \
                                     mod_posi[115], mod_posi[117]
 
@@ -318,11 +325,11 @@ def get_piece_moves(posi, white_to_move, _pieces):
                             original_square = mod_posi[enum_piece + move * go]
                             # Check if pawn's move is in the first two
                             # items in the list
-                            if _pieces[piece] in ['P','p'] and \
+                            if _pieces[piece] in ['P', 'p'] and \
                                     (move not in moves[piece][:2]):
                                 continue
-                        if _pieces[piece] in ['P','p'] and \
-                                ((enum_piece + move * go) in range(26,34)):
+                        if _pieces[piece] in ['P', 'p'] and \
+                                ((enum_piece + move * go) in range(26, 34)):
                             if _pieces[piece].isupper():
                                 mod_posi[enum_piece] = 'Q'
                             else: mod_posi[enum_piece] = 'q'
@@ -391,7 +398,7 @@ def play_move(position, searched_moves):
                 continue
 
 
-position = list(posiii)
+position = list(posi)
 print(board_view(position))
 white_to_move = True
 

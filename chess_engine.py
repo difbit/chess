@@ -199,7 +199,8 @@ class board_object(object):
         self.posi = list(self.posi)
 
 
-def chess_engine(): #This will be used for the evaluation function
+# This will be used for the evaluation function
+def chess_engine():
 
     BOARD_LIST = []
     EVALUATIONS = []
@@ -219,7 +220,6 @@ def chess_engine(): #This will be used for the evaluation function
         #    this_board = board_object(posi)
             #BOARD_LIST[1] = board_object(posi)
         BOARD_LIST.append(board_object(posi))
-        #    aaa = this_board.posi
             #with open('posi', 'wb') as f:
             #    pickle.dump(posi, f)
         #eval_1.evaluation_function()
@@ -382,11 +382,25 @@ def search_checks(orig_fetched_moves, white_to_move):
 
 def play_move(position, searched_moves):
     while True:
+        print("Write 'q' to exit the program.")
         pos = list(position)
         print("Select a piece from: \n%s" % sorted(player_posi.keys()))
         start = input()
+
+        if str(start) == 'q':
+            sys.exit()
+
+        if start not in player_posi.keys():
+            print("Invalid initial square.")
+            continue
+
         print("Select a destination square from: \n%s" % sorted(player_posi.keys()))
         dest = input()
+
+        if dest not in player_posi.keys():
+            print("Invalid destination square.")
+            continue
+
         start_posi = player_posi[start]
         dest_posi = player_posi[dest]
         if pos[dest_posi] != '-':
@@ -394,6 +408,8 @@ def play_move(position, searched_moves):
         else:
             square = pos[dest_posi]
 
+        # Just adds castling to board positions. The legality of the move is
+        # checked later.
         if start == 'e1' and dest == 'c1':
             pos[110], pos[113] = pos[113], pos[110]
 
@@ -408,7 +424,6 @@ def play_move(position, searched_moves):
             continue
         else:
             pos[start_posi], pos[dest_posi] = square, pos[start_posi]
-            print("DEST", posi[player_posi[dest]])
             if pos in searched_moves:
                 return pos
             else:
@@ -479,7 +494,6 @@ while True:
         if random_posi[114] != 'k':
             king_rook_move['k']['KING'] = True
     #print(king_rook_move)
-    #print(random_posi[114])
     if not white_to_move:
         print(board_view(rotate(list(random_posi))))
     else:

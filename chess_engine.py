@@ -62,6 +62,16 @@ player_posi = {
     'a1': 110, 'b1': 111, 'c1': 112, 'd1': 113, 'e1': 114, 'f1': 115, 'g1': 116, 'h1': 117,
 }
 
+player_posi_black = {
+    'h1': 26, 'g1': 27, 'f1': 28, 'e1': 29, 'd1': 30, 'c1': 31, 'b1': 32, 'a1': 33,
+    'h2': 38, 'g2': 39, 'f2': 40, 'e2': 41, 'd2': 42, 'c2': 43, 'b2': 44, 'a2': 45,
+    'h3': 50, 'g3': 51, 'f3': 52, 'e3': 53, 'd3': 54, 'c3': 55, 'b3': 56, 'a3': 57,
+    'h4': 62, 'g4': 63, 'f4': 64, 'e4': 65, 'd4': 66, 'c4': 67, 'b4': 68, 'a4': 69,
+    'h5': 74, 'g5': 75, 'f5': 76, 'e5': 77, 'd5': 78, 'c5': 79, 'b5': 80, 'a5': 81,
+    'h6': 86, 'g6': 87, 'f6': 88, 'e6': 89, 'd6': 90, 'c6': 91, 'b6': 92, 'a6': 93,
+    'h7': 98, 'g7': 99, 'f7': 100, 'e7': 101, 'd7': 102, 'c7': 103, 'b7': 104, 'a7': 105,
+    'h8': 110, 'g8': 111, 'f8': 112, 'e8': 113, 'd8': 114, 'c8': 115, 'b8': 116, 'a8': 117,
+}
 
 # Used for printing the board
 def board_list_view(list):
@@ -119,6 +129,40 @@ def rotate(BOARD):
         BOARD[62+SQUARE], BOARD[74+SQUARE] \
             = BOARD[74+SQUARE], BOARD[62+SQUARE]
     return BOARD
+
+
+def first_rotation(BOARD):
+    for SQUARE in range(0, 8):
+        BOARD[26 + SQUARE], BOARD[117 - SQUARE] \
+            = BOARD[117 - SQUARE], BOARD[26 + SQUARE]
+    for SQUARE in range(0, 8):
+        BOARD[38 + SQUARE], BOARD[105 - SQUARE] \
+            = BOARD[105 - SQUARE], BOARD[38 + SQUARE]
+    for SQUARE in range(0, 8):
+        BOARD[50 + SQUARE], BOARD[93 - SQUARE] \
+            = BOARD[93 - SQUARE], BOARD[50 + SQUARE]
+    for SQUARE in range(0, 8):
+        BOARD[62 + SQUARE], BOARD[81 - SQUARE] \
+            = BOARD[81 - SQUARE], BOARD[62 + SQUARE]
+    return BOARD
+
+
+def rotate_move_list(move_list):
+    for move in range(0, 8):
+        move_list[move], move_list[64 - move] \
+            = move_list[64 - move], move_list[move]
+    for move in range(0, 8):
+        move_list[38 + move], move_list[105 - move] \
+            = move_list[105 - move], move_list[38 + move]
+    for move in range(0, 8):
+        move_list[50 + move], move_list[93 - move] \
+            = move_list[93 - move], move_list[50 + move]
+    for move in range(0, 8):
+        move_list[62 + move], move_list[81 - move] \
+            = move_list[81 - move], move_list[62 + move]
+    return move_list
+
+
 
 _pieces = {
     "king": 'K', "rook": 'R', "pawn": 'P',
@@ -191,12 +235,44 @@ class Evaluate(object):
 
         return sum - sum_1
 
+    class board_object(object):
 
-class board_object(object):
+        def __init__(self, posi):
+            self.posi = posi
+            self.posi = list(self.posi)
 
-    def __init__(self, posi):
-        self.posi = posi
-        self.posi = list(self.posi)
+
+def evaluation_function(positions):
+    piece_values = {
+        'B': 310, 'N': 300, 'P': 100, 'R': 500, 'Q': 900, 'K': 10000
+    }
+
+    for position in positions:
+        sum = 0
+        sum_1 = 0
+
+        value_list = []
+
+        for piece in piece_values.keys():
+            value_list.append(position.count(piece)*piece_values[piece])
+
+        for i in value_list:
+            sum += i
+
+        del value_list [:]
+
+        piece_values = low(piece_values)
+
+        for i in piece_values.keys():
+            value_list.append(self.position.count(i)*piece_values[i])
+
+        for i in value_list:
+            sum_1 += i
+        black_pieces = False
+
+    return sum - sum_1
+
+
 
 
 # This will be used for the evaluation function
@@ -380,7 +456,9 @@ def search_checks(orig_fetched_moves, white_to_move):
     return orig_fetched_moves, white_to_move
 
 
-def play_move(position, searched_moves):
+def play_move(position, searched_moves, player):
+    if player == "black":
+        player_posi = player_posi_black
     while True:
         print("Write 'q' to exit the program.")
         pos = list(position)
@@ -433,17 +511,40 @@ def play_move(position, searched_moves):
 position = list(posiii)
 print(board_view(position))
 white_to_move = True
+player = ""
+
+while True:
+    print("Write w or W to choose White pieces. Else write b or B to choose "
+          "Black pieces.")
+    choice = input()
+    if choice in ['w', 'W']:
+        player = "white"
+        break
+    elif choice in ['b', 'B']:
+        player = "black"
+        break
+    else:
+        continue
+
+if player == "black":
+    position = first_rotation(position)
+print(board_view(position))
+#    random_posi = play_move(position, searched_moves[0][0])
+#else:
+#    random_posi = random.choice(searched_moves[0][0])
+
 
 # Change starting position here
 fetched_moves = get_piece_moves(position, white_to_move, _pieces)
 orig_fetched_moves = list(fetched_moves)
 searched_moves = search_checks(orig_fetched_moves, white_to_move)
-#print("SEARCHED MOVES", searched_moves)
 
+
+#print("SEARCHED MOVES", searched_moves)
 #print("KING ROOK MOVE", king_rook_move)
-random_posi = play_move(position, searched_moves[0][0])
 
 #random_posi = random.choice(searched_moves[0][0])
+random_posi = play_move(position, searched_moves[0][0], player)
 print(board_view(random_posi))
 if white_to_move:
     if random_posi[110] != 'R':
@@ -468,14 +569,20 @@ while True:
     fetched_moves = get_piece_moves(random_posi, white_to_move, _pieces)
     orig_fetched_moves = list(fetched_moves)
     searched_moves = search_checks(orig_fetched_moves, white_to_move)
-    if searched_moves[0][0] == []:
+    if not searched_moves[0][0]:
         print("It is checkmate or stalemate")
         exit()
 
+   # if white_to_move and player == "white":
     if white_to_move:
-        random_posi = play_move(random_posi, searched_moves[0][0])
+        random_posi = play_move(random_posi, searched_moves[0][0], player)
     else:
         random_posi = random.choice(searched_moves[0][0])
+    # if white_to_move and player == "black":
+    #if not white_to_move and player == "white":
+
+   # if not white_to_move and player == "black":
+   # else:
 
     #print("KING ROOK MOVE", king_rook_move)
 

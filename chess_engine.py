@@ -51,7 +51,7 @@ posi = [
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0                   # 132-143
     ]
 
-player_posi = {
+player_posi_white = {
     'a8': 26, 'b8': 27, 'c8': 28, 'd8': 29, 'e8': 30, 'f8': 31, 'g8': 32, 'h8': 33,
     'a7': 38, 'b7': 39, 'c7': 40, 'd7': 41, 'e7': 42, 'f7': 43, 'g7': 44, 'h7': 45,
     'a6': 50, 'b6': 51, 'c6': 52, 'd6': 53, 'e6': 54, 'f6': 55, 'g6': 56, 'h6': 57,
@@ -435,12 +435,13 @@ def bool_negation(bool):
     return not bool
 
 
-def search_checks(orig_fetched_moves, white_to_move):
+def search_checks(orig_fetched_moves, white_to_move, player):
     white_to_move = bool_negation(white_to_move)
     remove_these = []
     for posit in orig_fetched_moves[0]:
         # white to move is set to false
-        rotate(posit)
+        if player != 'black':
+            rotate(posit)
         fetched_moves = get_piece_moves(posit, white_to_move, _pieces)
 
         # Search boards if one king is missing
@@ -449,7 +450,8 @@ def search_checks(orig_fetched_moves, white_to_move):
             if len(kings) < 2:
                 remove_these.append(posit)
                 break
-        rotate(posit)
+        if player != 'black':
+            rotate(posit)
     for rem in remove_these:
         orig_fetched_moves[0].remove(rotate(rem))
     white_to_move = bool_negation(white_to_move)
@@ -459,6 +461,9 @@ def search_checks(orig_fetched_moves, white_to_move):
 def play_move(position, searched_moves, player):
     if player == "black":
         player_posi = player_posi_black
+    else:
+        player_posi = player_posi_white
+
     while True:
         print("Write 'q' to exit the program.")
         pos = list(position)
@@ -522,30 +527,36 @@ while True:
         break
     elif choice in ['b', 'B']:
         player = "black"
+        white_to_move = False
         break
     else:
         continue
 
-if player == "black":
-    position = first_rotation(position)
-print(board_view(position))
-#    random_posi = play_move(position, searched_moves[0][0])
-#else:
-#    random_posi = random.choice(searched_moves[0][0])
+# THIS NEEDS TO BE CLEANED, BUT IT WORKS OK
+if not white_to_move:
+    white_to_move = True
+    # Change starting position here
+    fetched_moves = get_piece_moves(position, white_to_move, _pieces)
+    orig_fetched_moves = list(fetched_moves)
+    searched_moves = search_checks(orig_fetched_moves, white_to_move, player)
+    random_posi = random.choice(searched_moves[0][0])
+    white_to_move = False
 
+    position = first_rotation(random_posi)
+    fetched_moves = get_piece_moves(random_posi, white_to_move, _pieces)
+    orig_fetched_moves = list(fetched_moves)
+    searched_moves = search_checks(orig_fetched_moves, white_to_move, player)
 
-# Change starting position here
-fetched_moves = get_piece_moves(position, white_to_move, _pieces)
-orig_fetched_moves = list(fetched_moves)
-searched_moves = search_checks(orig_fetched_moves, white_to_move)
+    print(board_view(position))
+    random_posi = play_move(position, searched_moves[0][0], player)
+else:
+    fetched_moves = get_piece_moves(position, white_to_move, _pieces)
+    orig_fetched_moves = list(fetched_moves)
+    searched_moves = search_checks(orig_fetched_moves, white_to_move, player)
+    random_posi = play_move(position, searched_moves[0][0], player)
 
-
-#print("SEARCHED MOVES", searched_moves)
-#print("KING ROOK MOVE", king_rook_move)
-
-#random_posi = random.choice(searched_moves[0][0])
-random_posi = play_move(position, searched_moves[0][0], player)
 print(board_view(random_posi))
+
 if white_to_move:
     if random_posi[110] != 'R':
         king_rook_move['K']['ROOK_Q'] = True
@@ -561,23 +572,28 @@ else:
     if random_posi[114] != 'k':
         king_rook_move['k']['KING'] = True
 
-#print("WHITE TO MOVE", white_to_move)
-
 while True:
     white_to_move = bool_negation(white_to_move)
-    rotate(random_posi)
+    if player != "black":
+        rotate(random_posi)
     fetched_moves = get_piece_moves(random_posi, white_to_move, _pieces)
     orig_fetched_moves = list(fetched_moves)
-    searched_moves = search_checks(orig_fetched_moves, white_to_move)
+    searched_moves = search_checks(orig_fetched_moves, white_to_move, player)
     if not searched_moves[0][0]:
         print("It is checkmate or stalemate")
         exit()
 
    # if white_to_move and player == "white":
-    if white_to_move:
-        random_posi = play_move(random_posi, searched_moves[0][0], player)
+    if player != 'black':
+        if white_to_move:
+            random_posi = play_move(random_posi, searched_moves[0][0], player)
+        else:
+            random_posi = random.choice(searched_moves[0][0])
     else:
-        random_posi = random.choice(searched_moves[0][0])
+        if white_to_move:
+            random_posi = random.choice(searched_moves[0][0])
+        else:
+            random_posi = play_move(random_posi, searched_moves[0][0], player)
     # if white_to_move and player == "black":
     #if not white_to_move and player == "white":
 
@@ -601,8 +617,11 @@ while True:
         if random_posi[114] != 'k':
             king_rook_move['k']['KING'] = True
     #print(king_rook_move)
-    if not white_to_move:
-        print(board_view(rotate(list(random_posi))))
+    if player != 'black':
+        if not white_to_move:
+            print(board_view(rotate(list(random_posi))))
+        else:
+            print(board_view(random_posi))
     else:
         print(board_view(random_posi))
     #print("WHITE TO MOVE", white_to_move)
